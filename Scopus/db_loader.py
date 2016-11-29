@@ -11,6 +11,7 @@ import zipfile
 
 import django
 from django.utils.encoding import smart_str
+import django.db
 
 django.setup()
 
@@ -129,6 +130,9 @@ def bulk_create(queries):
         # When transaction as bulk is failed, then go through each query
         # one by one and create them. Also, log failed queries.
         create_queries_one_by_one(queries=queries)
+
+    # Avoid memory leak when DEBUG == True
+    django.db.reset_queries()
 
 
 def load_to_db(itemids, authorships, citations, documents):

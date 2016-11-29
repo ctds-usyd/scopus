@@ -8,15 +8,13 @@ import time
 import os
 import tarfile
 import zipfile
-import functools
-import io
 
 import django
 from django.utils.encoding import smart_str
 
 django.setup()
 
-from Scopus.models import(
+from Scopus.models import (
     ItemID,
     Source,
     Document,

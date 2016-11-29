@@ -1,13 +1,13 @@
 # Elsevier Scopus custom data extraction and RDBMS export
 
-<h1> Dependencies </h1>
+## Setup and Running 
+
+### Dependencies
 
 * Python 2.7 or >=3.3
 * MySQL
 
-<h1> Setup and Running </h1>
-
-<h3> MySQL </h3>
+### MySQL setup
 
 * Create a database in MySQL shell of the server 
     * `create database <DATABASE_NAME>; 
@@ -17,11 +17,8 @@
     * `set global net_buffer_length=1000000;`
     * `set global max_allowed_packet=1000000000;`
 
-<h3> Code </h3>
+### Server
 
-Copy the code to the server at `LINK_TO_THE_PROJECT_DIRECTORY`
-
-<h3> Server </h3>
 If there is a virtualenv on the server, type `workon <VM_NAME>` in shell to start the VM. Otherwise, 
 create one as following:
 
@@ -40,17 +37,17 @@ create one as following:
         * `cd <LINK_TO_THE_PROJECT_DIRECTORY>`
     * Start VM by typing `workon scopus_vm` 
 
-<h3> Install python packages </h3>
+### Install python packages
 
 * Start VM by typing `workon scopus_vm`  
 * `pip install -r requirements.txt`
 
-<h3> Create tables in database </h3>
+### Create tables in database 
 
 * Modify the database settings in the `DATABASES` at `Scopus/settings.py`.
 * `./manage.py migrate  # set up DB tables`
 
-<h3> Running </h3>
+### Running 
 
 * Ensure the data is decrypted and available in Zips.
 You can use the included script `batch_ungpg.sh` to do this easily.
@@ -60,8 +57,6 @@ You can use the included script `batch_ungpg.sh` to do this easily.
   as an example is: 
   
   `nohup ./extract_to_db.sh /home/compressed-scopus/2011/ > 2011.txt`
-
-
 
 ## Schema
 

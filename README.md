@@ -234,3 +234,7 @@ Quit the server with CONTROL-C.
 ```
 
 Open `http://127.0.0.1:8000/admin` to browse.
+
+## Authors
+
+This package has been developed by Nikzad Babaii Rizvandi and Joel Nothman within the Sydney Informatics Hub. Copyright ©2016, University of Sydney.

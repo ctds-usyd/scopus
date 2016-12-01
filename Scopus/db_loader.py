@@ -57,7 +57,9 @@ def aggregate_records(item):
         for name, max_length in trunc_data:
             val = getattr(obj, name, None)
             if val is not None and len(val) > max_length:
-                logging.warning('Truncating {}.{} to {} chars (was {}) for {} while processing doc {}'.format(type(obj).__name__, name, max_length, len(val), obj, eid))
+                json_log(error='Truncation of oversize {}.{} (max_length={})'.format(type(obj).__name__, name, max_length),
+                         length=len(val),
+                         context={'eid': eid, 'obj': str(obj)})
                 setattr(obj, name, val[:max_length])
 
         return obj  # allow chaining
@@ -120,7 +122,7 @@ def create_queries_one_by_one(queries):
         try:
             query.save()
         except Exception:
-            json_log(error='Loading to database failed', exception=True)
+            json_log(error='Loading to database failed', context=str(query), exception=True)
 
 
 def bulk_create(queries):
@@ -214,9 +216,7 @@ def extract_and_load_docs(path):
         item = {'document': extract_document_information(doc_file),
                 'citation': extract_document_citations(citedby_file)}
 
-        if item['document'] is None:
-            json_log(method=logging.error, error='Issue on xml_extract', path=path, exception=True)
-        else:
+        if item['document'] is not None:
             (itemids, authorships, citations, documents) = aggregate_records(item)
             itemid_batch.extend(itemids)
             authorship_batch.extend(authorships)

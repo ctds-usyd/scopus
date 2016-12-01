@@ -123,7 +123,12 @@ def _get_data_from_doc(document, eid):
             author_context = {'eid': eid, 'afid': afid}
             author_id = int_or_none(xpath_get_one(author, '@auid', context=author_context, warn_zero=False))
             author_context['auid'] = author_id
-            seq = int(xpath_get_one(author, '@seq', context=author_context, default=1, warn_zero=False))
+            seq = xpath_get_one(author, '@seq', context=author_context, default=1, warn_zero=False)
+            if seq == '':
+                seq = 1
+                n_authors = len(document.xpath('/xocs:doc/xocs:item/item/bibrecord/head//author'))
+                json_log(context=author_context, error='Found empty string in `seq` attribute. Setting to 1',
+                         n_author_nodes=n_authors)
             surname = clean_text(xpath_get_one(author, './ce:surname', context=author_context))
             initials_node = xpath_get_one(author, './ce:initials', context=author_context, warn_zero=False)
             initials = clean_text(initials_node) if initials_node is not None else None

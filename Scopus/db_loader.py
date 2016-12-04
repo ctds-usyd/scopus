@@ -192,7 +192,7 @@ def generate_xml_pairs(path):
             backlog[key] = (path, xml)
 
     if backlog:
-        raise ValueError('Found unpaired XML files: %s' % [path for path, _ in backlog.values()])
+        json_log(error='Found unpaired XML files: %s' % [path for path, _ in backlog.values()], exception=True)
 
 
 def extract_and_load_docs(path):

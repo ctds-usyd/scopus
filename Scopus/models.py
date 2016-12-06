@@ -23,7 +23,7 @@ class Source(models.Model):
                                               ('n', 'n = Newsletter'),
                                               ('w', 'w = Newspaper'),
                                               ])
-    source_title = models.CharField(max_length=300, null=False, blank=False)
+    source_title = models.CharField(max_length=350, null=False, blank=False)
     source_abbrev = models.CharField(max_length=150, null=False, blank=False)
     issn_print = models.CharField(max_length=15, null=True, blank=False, db_index=True)
     issn_electronic = models.CharField(max_length=15, null=True, blank=False, db_index=True)
@@ -104,7 +104,7 @@ class Authorship(models.Model):
     surname = models.CharField(max_length=100, null=False, blank=False)
     order = models.PositiveIntegerField(default=0, help_text='1 for first author, etc. Can have multiple Authorship entries for one value of order.')
     affiliation_id = models.IntegerField(db_index=True, null=True, help_text="Scopus's afid")
-    organization = models.CharField(max_length=200, default='', db_index=True,
+    organization = models.CharField(max_length=300, default='', db_index=True,
                                     help_text='Name from 1st organization node in affiliation details')
     department = models.CharField(max_length=200, default='',
                                   help_text='Name from 2nd organization node in affiliation details')

@@ -130,8 +130,10 @@ def _get_data_from_doc(document, eid):
             authors_list[author_id, initials, surname, seq][afid] = (department, organization, country, city)
 
     if len(set(seq for _, _, _, seq in authors_list)) < len(authors_list):
+        # Happens quite frequently, with multiple alternative name extractions for same author
         json_log(error='Found duplicate `seq` values for authors: {!r}'.format(authors_list.keys()),
-                 context={'eid': eid})
+                 context={'eid': eid},
+                 method=logging.debug)
 
     data['authors'] = dict(authors_list)
 

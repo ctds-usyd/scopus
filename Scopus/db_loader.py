@@ -35,6 +35,14 @@ MAX_BATCH_SIZE = 5000
 
 
 def aggregate_records(item):
+    """Creates Django model objects from an object produced in xml_extract
+
+    Parameters
+    ----------
+    item : dict
+        Key 'document' points to the output of `extract_document_information`.
+        Key 'citation' points to the output of `extract_document_citations`.
+    """
     itemids = []
     authorships = []
     citations = []
@@ -116,7 +124,11 @@ def aggregate_records(item):
 
 
 def create_queries_one_by_one(queries):
-    # iterates over each query. Better way is to use divide-and-conqure
+    """Creates objects in DB individually
+    
+    Used when bulk create fails
+    """
+    # iterates over each query
     for query in queries:
         try:
             query.save()
@@ -125,6 +137,10 @@ def create_queries_one_by_one(queries):
 
 
 def bulk_create(queries):
+    """Create all objects in the database
+
+    Objects in queries must all be of the same class
+    """
     model = queries[0].__class__
     try:
         model.objects.bulk_create(queries)
@@ -138,6 +154,7 @@ def bulk_create(queries):
 
 
 def load_to_db(itemids, authorships, citations, documents):
+    """Save Django objects in bulk"""
     bulk_create(queries=documents)
     bulk_create(queries=itemids)
     bulk_create(queries=authorships)
@@ -165,7 +182,7 @@ def _generate_files(path):
 
 
 def generate_xml_pairs(path):
-    """Finds and opens pairs of citedby
+    """Finds and returns contents for pairs of XML documents and citedby
 
     path may be:
         * a directory in which to find XML/TAR/ZIP files
@@ -198,6 +215,15 @@ def generate_xml_pairs(path):
 
 
 def extract_and_load_docs(path):
+    """Main driver for loading all XML from a path to a database
+
+    Parameters
+    ----------
+    path : string
+
+        This can either be a directory to be recursed (containing XML or Zip or
+        TAR), or a single Zip or TAR file.
+    """
     counter = -1
     itemid_batch = []
     authorship_batch = []

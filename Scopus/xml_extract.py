@@ -6,8 +6,19 @@ import traceback
 import re
 
 from django.utils.encoding import smart_text
+
+
 def id_to_int(x):
+    """Clean Scopus ID string used in filenames"""
     return int(x.split('2-s2.0-')[1])
+
+
+def json_log(method=logging.warning, **kwargs):
+    """Issue a log as a JSON object"""
+    if kwargs.get('exception'):
+        kwargs['exception'] = traceback.format_exc()
+    method(json.dumps(kwargs, sort_keys=True))
+
 
 NAMESPACES = {
     'xocs': "http://www.elsevier.com/xml/xocs/dtd",
@@ -16,13 +27,26 @@ NAMESPACES = {
 }
 
 
-def json_log(method=logging.warning, **kwargs):
-    if kwargs.get('exception'):
-        kwargs['exception'] = traceback.format_exc()
-    method(json.dumps(kwargs, sort_keys=True))
-
-
 def xpath_get_one(root, path, context=None, default=None, warn_zero=True):
+    """Match an XPath that is expected to return exactly one result
+
+    Assures quality by logging when this expectation is violated, i.e. the
+    XPath returns 0 results (logged if warn_zero is True) or more than 1.
+
+    Parameters
+    ----------
+    root : lXML element
+        Evaluate XPath relative to this node
+    path : string
+        An XPath
+    context : dict, optional
+        Information to report in an error
+    default : any, optional
+        If no object is matched, return this value
+    warn_zero : boolean, default True
+        Whether it is offensive for the query to return no results,
+        and therefore a warning should be logged.
+    """
     out = root.xpath(path, namespaces=NAMESPACES)
     if len(out) == 1:
         return out[0]
@@ -152,8 +176,9 @@ def _parse(f):
 
 
 def extract_document_information(document):
-    """
-    Extracts information from XML file of the document. Information includes but not limited to:
+    """Extract information from XML file of the document.
+
+    Information includes but not limited to:
     - title
     - authors
     - authors' affiliations
@@ -162,7 +187,14 @@ def extract_document_information(document):
     - keywords (if any)
     - catagory
 
-    Note: can return None if exception; otherwise dict
+    Parameters
+    ----------
+    document : XML string, path string or file object
+
+    Returns
+    -------
+    data : None in case of exception; otherwise dict
+        The returned dict has a custom structure
     """
     document = _parse(document)
 
@@ -177,6 +209,16 @@ def extract_document_information(document):
 
 
 def extract_document_citations(citation):
+    """Extract information from citedby XML file.
+
+    Parameters
+    ----------
+    document : XML string, path string or file object
+
+    Returns
+    -------
+    dict
+    """
     citation = _parse(citation)
     citations = citation.findall('citing-doc')
     count = int(citation.find('count').text)

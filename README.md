@@ -1,6 +1,6 @@
 # Elsevier Scopus custom data extraction and RDBMS export
 
-## Setup and Running 
+## Setup and Running
 
 ### Dependencies
 
@@ -9,9 +9,9 @@
 
 ### MySQL setup
 
-* Create a database in MySQL shell of the server 
-    * `create database <DATABASE_NAME>; 
-    * If using MySQL 5.1, add `character set utf8 collate utf8_general_ci;` 
+* Create a database in MySQL shell of the server
+    * `create database <DATABASE_NAME>`;
+    * If using MySQL 5.1, add `character set utf8 collate utf8_general_ci;`
     to the end of the above command
 * Ensure batch processing is enabled on database:
     * `set global net_buffer_length=1000000;`
@@ -19,43 +19,43 @@
 
 ### Server
 
-If there is a virtualenv on the server, type `workon <VM_NAME>` in shell to start the VM. Otherwise, 
+If there is a virtualenv on the server, type `workon <VENV_NAME>` in shell to start the VENV. Otherwise,
 create one as following:
 
 * Install `pip`
 * Install python virtualenv as
     * `pip install --upgrade virtualenv`
-    * `pip install --upgrade virtualenvwrapper` (if it gives error 
+    * `pip install --upgrade virtualenvwrapper` (if it gives error
    add `--ignore-installed six` to the end of the line)
     * In `~/.profile`, add
         *  `export WORKON_HOME=$HOME/.virtualenvs`
         *  `export PROJECT_HOME=$HOME/Projects`
         *  `source /usr/local/bin/virtualenvwrapper.sh`
-    * Create `scopus_vm` virtual vm (as an example)
-        * `mkvirtualenv scopus_vm --python=$HOME/<LINK_TO_PYTHON>`
-    * In `~/.virtualenvs/scopus_vm/bin/postactivate` add
+    * Create `scopus` virtual environment (as an example)
+        * `mkvirtualenv scopus --python=$HOME/<LINK_TO_PYTHON>`
+    * In `~/.virtualenvs/scopus/bin/postactivate` add
         * `cd <LINK_TO_THE_PROJECT_DIRECTORY>`
-    * Start VM by typing `workon scopus_vm` 
+    * Start virtual environment by typing `workon scopus`
 
 ### Install python packages
 
-* Start VM by typing `workon scopus_vm`  
+* Start virtual environment by typing `workon scopus`
 * `pip install -r requirements.txt`
 
-### Create tables in database 
+### Create tables in database
 
 * Modify the database settings in the `DATABASES` at `Scopus/settings.py`.
 * `./manage.py migrate  # set up DB tables`
 
-### Running 
+### Running
 
 * Ensure the data is decrypted and available in Zips.
 You can use the included script `batch_ungpg.sh` to do this easily.
 
 * `./extract_to_db.sh /path/to/zipfile1.zip /path/to/zipfile2.zip ...`
-  
-  as an example is: 
-  
+
+  as an example is:
+
   `nohup ./extract_to_db.sh /home/compressed-scopus/2011/ > 2011.txt`
 
 ## Schema
@@ -221,7 +221,7 @@ $ ./manage.py createsuperuser
 
 then run a server instance (note that `runserver` is not very secure; see
 [deployment docs](https://docs.djangoproject.com/en/1.10/howto/deployment/) for
-more robust configurations):
+more robust configurations, and do not open `runserver` to a public IP address):
 
 ```bash
 $ ./manage.py runserver

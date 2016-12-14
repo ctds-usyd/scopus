@@ -11,7 +11,7 @@
 
 * Create a database in MySQL shell of the server 
     * `create database <DATABASE_NAME>; 
-    * If using MySQL 7.1, add `character set utf8 collate utf8_general_ci;` 
+    * If using MySQL 5.1, add `character set utf8 collate utf8_general_ci;` 
     to the end of the above command
 * Ensure batch processing is enabled on database:
     * `set global net_buffer_length=1000000;`

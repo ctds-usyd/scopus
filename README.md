@@ -44,7 +44,10 @@ create one as following:
 
 ### Create tables in database
 
-* Modify the database settings in the `DATABASES` at `Scopus/settings.py`.
+* Define `DATABASE_NAME`, `DATABASE_USER` and `PASSWORD` as enviornment variables by adding it to `.profile`:
+     * export DATABASE_NAME='<DATABASENAME>'
+     * export DATABASE_USER='<DATABASE_USER>'
+     * export PASSWORD='<PASSWORD>'
 * `./manage.py migrate  # set up DB tables`
 
 ### Running

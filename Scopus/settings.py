@@ -72,10 +72,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Scopus.wsgi.application'
 
-
-DATABASE_NAME = 'DATABASE_NAME'
-DATABASE_USER = 'DATABASE_USER'
-PASSWORD = 'PASSWORD'
+# Put these values in ~/.profile
+DATABASE_NAME = os.environ.get('DATABASE_NAME')
+DATABASE_USER = os.environ.get('DATABASE_USER')
+PASSWORD = os.environ.get('PASSWORD')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',

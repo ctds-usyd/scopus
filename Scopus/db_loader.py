@@ -21,6 +21,7 @@ from Scopus.models import (
     Document,
     Citation,
     Authorship,
+    Abstract,
 )
 from Scopus.xml_extract import (
     extract_document_information,
@@ -39,6 +40,7 @@ def aggregate_records(item):
     authorships = []
     citations = []
     documents = []
+    abstracts = []
 
     document = item['document']
     eid = document['eid']
@@ -91,9 +93,14 @@ def aggregate_records(item):
                               citation_count=item['citation']['count'],
                               pub_year=document['pub-year'],
                               title_language=document['title_language'],
-                              citation_type=document['citation_type'],
-                              abstract=document['abstract']))
+                              citation_type=document['citation_type']
+                              ))
+
     truncate_fields(documents[-1])
+
+    abstracts.append(Abstract(document=eid,
+                              abstract=document['abstract']))
+    truncate_fields(abstracts[-1])
 
     for (author_id, initials, surname, order), affiliations in document['authors'].items():
         for afid, (department, organization, country, city) in affiliations.items():
@@ -112,7 +119,7 @@ def aggregate_records(item):
     for citation in item['citation']['eid']:
         citations.append(Citation(cite_to=eid, cite_from=citation))
 
-    return itemids, authorships, citations, documents
+    return itemids, authorships, citations, documents, abstracts
 
 
 def create_queries_one_by_one(queries):
@@ -137,11 +144,12 @@ def bulk_create(queries):
     django.db.reset_queries()
 
 
-def load_to_db(itemids, authorships, citations, documents):
+def load_to_db(itemids, authorships, citations, documents, abstracts):
     bulk_create(queries=documents)
     bulk_create(queries=itemids)
     bulk_create(queries=authorships)
     bulk_create(queries=citations)
+    bulk_create(queries=abstracts)
 
 
 def _generate_files(path):
@@ -203,6 +211,7 @@ def extract_and_load_docs(path):
     authorship_batch = []
     document_batch = []
     citation_batch = []
+    abstract_batch = []
 
     for counter, (path, doc_file, citedby_file) in enumerate(generate_xml_pairs(path)):
         if counter % MAX_BATCH_SIZE == 0:
@@ -219,11 +228,12 @@ def extract_and_load_docs(path):
                 'citation': extract_document_citations(citedby_file)}
 
         if item['document'] is not None:
-            (itemids, authorships, citations, documents) = aggregate_records(item)
+            (itemids, authorships, citations, documents, abstracts) = aggregate_records(item)
             itemid_batch.extend(itemids)
             authorship_batch.extend(authorships)
             citation_batch.extend(citations)
             document_batch.extend(documents)
+            abstract_batch.extend(abstracts)
 
     if counter < 0:
         json_log(error='Processed 0 records!', exception=True)
@@ -231,7 +241,7 @@ def extract_and_load_docs(path):
 
     # At end of the year, flush out all remaining records
     logging.info('Saving after %d records' % counter)
-    load_to_db(itemid_batch, authorship_batch, citation_batch, document_batch)
+    load_to_db(itemid_batch, authorship_batch, citation_batch, document_batch, abstract_batch)
     logging.info('Done')
 
 

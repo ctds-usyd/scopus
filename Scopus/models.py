@@ -23,8 +23,8 @@ class Source(models.Model):
                                               ('n', 'n = Newsletter'),
                                               ('w', 'w = Newspaper'),
                                               ])
-    source_title = models.CharField(max_length=350, null=False, blank=False)
-    source_abbrev = models.CharField(max_length=150, null=False, blank=False)
+    source_title = models.CharField(max_length=400, null=False, blank=False)
+    source_abbrev = models.CharField(max_length=200, null=False, blank=False)
     issn_print = models.CharField(max_length=15, null=True, blank=False, db_index=True)
     issn_electronic = models.CharField(max_length=15, null=True, blank=False, db_index=True)
 

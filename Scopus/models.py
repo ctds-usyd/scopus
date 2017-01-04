@@ -50,7 +50,7 @@ class Document(models.Model):
     group_id = models.BigIntegerField(db_index=True, null=True, blank=True,
                                       help_text='An EID shared by likely duplicate doc entries')
     # keywords = models.ManyToManyField(Keywords)
-    title = models.CharField(max_length=400, null=False, blank=False,
+    title = models.CharField(max_length=500, null=False, blank=False,
                              help_text='The original (untranslated) title')
     source = models.ForeignKey(Source, blank=True, null=True,
                                db_index=True, help_text='Where the document is published')

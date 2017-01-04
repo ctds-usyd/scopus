@@ -13,7 +13,7 @@
     * `create database <DATABASE_NAME> CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;`
       (MySQL doesn't support complete utf-8 encoding, so the encoding should be converted to `utf8mb4`)
     to the end of the above command
-* Ensure batch processing is enabled on database:
+* Ensure batch processing is enabled on database ( if using MySQL < 5.5):
     * `set global net_buffer_length=1000000;`
     * `set global max_allowed_packet=1000000000;`
 
@@ -78,6 +78,7 @@ The tables ("models" in Django terminology) we store are:
 * `Authorship`: authors, their order and affiliation
 * `ItemID`: list of alternative IDs registered for the docoument
 * `Citation`: which publications in the Scopus database cited a document
+* `Abstract`: the abstract fields of documents
 
 We use **Scopus IDs** where we can, notably:
 

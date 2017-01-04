@@ -11,6 +11,16 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
+            name='Abstract',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('abstract', models.CharField(default=b'', help_text=b'The article abstract', max_length=1000)),
+            ],
+            options={
+                'db_table': 'abstract',
+            },
+        ),
+        migrations.CreateModel(
             name='Authorship',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
@@ -49,7 +59,6 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(help_text=b'The original (untranslated) title', max_length=400)),
                 ('citation_count', models.IntegerField(default=0, help_text=b'Citation count from citedby.xml')),
                 ('title_language', models.CharField(default=b'', help_text=b'The language of the original title', max_length=5)),
-                ('abstract', models.CharField(default=b'', help_text=b'Abstract is not currently imported', max_length=1000)),
                 ('citation_type', models.CharField(default=b'', help_text=b'The type of document', max_length=5, choices=[(b'ab', b'ab = Abstract Report'), (b'ar', b'ar = Article'), (b'ba', b'ba'), (b'bk', b'bk = Book'), (b'br', b'br = Book Review'), (b'bz', b'bz = Business Article'), (b'cb', b'cb = Conference Abstract'), (b'ch', b'ch = Chapter'), (b'cp', b'cp = Conference Paper'), (b'cr', b'cr = Conference Review'), (b'di', b'di = Dissertation'), (b'ed', b'ed = Editorial'), (b'er', b'er = Erratum'), (b'ip', b'ip = Article in Press'), (b'le', b'le = Letter'), (b'no', b'no = Note'), (b'pa', b'pa = Patent'), (b'pr', b'pr = Press Release'), (b're', b're = Review'), (b'rf', b'rf'), (b'rp', b'rp = Report'), (b'sh', b'sh = Short Survey'), (b'wp', b'wp = Working Paper')])),
             ],
             options={
@@ -94,6 +103,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='authorship',
+            name='document',
+            field=models.ForeignKey(to='Scopus.Document'),
+        ),
+        migrations.AddField(
+            model_name='abstract',
             name='document',
             field=models.ForeignKey(to='Scopus.Document'),
         ),

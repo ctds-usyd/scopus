@@ -57,8 +57,6 @@ class Document(models.Model):
     citation_count = models.IntegerField(default=0, help_text='Citation count from citedby.xml')
     title_language = models.CharField(max_length=5, default='',
                                       help_text='The language of the original title')
-    abstract = models.CharField(max_length=1000, default='',
-                                help_text='Abstract is not currently imported')
     citation_type = models.CharField(max_length=5, default='',
                                      help_text='The type of document',
                                      choices=[
@@ -141,3 +139,12 @@ class Citation(models.Model):
 
     def __str__(self):
         return '<{} cited {}>'.format(self.cite_from, self.cite_to)
+
+
+class Abstract(models.Model):
+    class Meta:
+        db_table = 'abstract'
+
+    document = models.ForeignKey(Document, null=False, db_index=True)
+    abstract = models.CharField(max_length=1000, default='',
+                                help_text='The article abstract')

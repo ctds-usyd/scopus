@@ -98,7 +98,7 @@ def aggregate_records(item):
 
     truncate_fields(documents[-1])
 
-    abstracts.append(Abstract(document=eid,
+    abstracts.append(Abstract(document_id=eid,
                               abstract=document['abstract']))
     truncate_fields(abstracts[-1])
 
@@ -218,11 +218,13 @@ def extract_and_load_docs(path):
             if counter > 0:
                 logging.info('Saving after %d records' % counter)
                 load_to_db(itemid_batch, authorship_batch,
-                           citation_batch, document_batch)
+                           citation_batch, document_batch,
+                           abstract_batch)
             itemid_batch = []
             authorship_batch = []
             document_batch = []
             citation_batch = []
+            abstract_batch = []
 
         item = {'document': extract_document_information(doc_file),
                 'citation': extract_document_citations(citedby_file)}

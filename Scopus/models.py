@@ -146,5 +146,5 @@ class Abstract(models.Model):
         db_table = 'abstract'
 
     document = models.ForeignKey(Document, null=False, db_index=True)
-    abstract = models.CharField(max_length=1000, default='',
+    abstract = models.CharField(max_length=6000, default='',
                                 help_text='The article abstract')

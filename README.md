@@ -10,8 +10,8 @@
 ### MySQL setup
 
 * Create a database in MySQL shell of the server
-    * `create database <DATABASE_NAME>`;
-    * If using MySQL 5.1, add `character set utf8 collate utf8_general_ci;`
+    * `create database <DATABASE_NAME> CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;`
+      (MySQL doesn't support complete utf-8 encoding, so the encoding should be converted to `utf8mb4`)
     to the end of the above command
 * Ensure batch processing is enabled on database:
     * `set global net_buffer_length=1000000;`

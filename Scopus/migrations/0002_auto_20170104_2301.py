@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='abstract',
             name='abstract',
-            field=models.CharField(default=b'', help_text=b'The article abstract', max_length=6000),
+            field=models.CharField(default=b'', help_text=b'The article abstract', max_length=10000),
         ),
     ]

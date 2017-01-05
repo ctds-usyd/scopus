@@ -1,5 +1,5 @@
-from django.db import models
-
+from django.db import models, transaction
+from django.core.exceptions import MultipleObjectsReturned
 
 # class Keywords(models.Model):
 #     keyword = models.CharField(max_length=30)
@@ -27,6 +27,26 @@ class Source(models.Model):
     source_abbrev = models.CharField(max_length=200, null=False, blank=False)
     issn_print = models.CharField(max_length=15, null=True, blank=False, db_index=True)
     issn_electronic = models.CharField(max_length=15, null=True, blank=False, db_index=True)
+
+    @classmethod
+    @transaction.atomic
+    def get_or_create(cls, source_id, issn_print, issn_electronic):
+        """
+        To avoid creating multiple similar records by more than one thread.
+        Note: get_or_create method in Django is not thread safe:
+        http://stackoverflow.com/questions/6416213/is-get-or-create-thread-safe
+        http://stackoverflow.com/questions/2235318/how-do-i-deal-with-this-race-condition-in-django
+        """
+        try:
+            obj, created = cls.objects.get_or_create(source_id=source_id,
+                                                     issn_print=issn_print,
+                                                     issn_electronic=issn_electronic)
+        except MultipleObjectsReturned:
+            created = False
+            obj = cls.objects.get(source_id=source_id,
+                                  issn_print=issn_print,
+                                  issn_electronic=issn_electronic)
+        return obj, created
 
     def _type_label(self):
         return dict(self._meta.get_field('source_type').choices)[self.source_type]

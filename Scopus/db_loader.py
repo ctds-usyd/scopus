@@ -74,10 +74,9 @@ def aggregate_records(item):
      source_type,
      issn_print,
      issn_electronic) = document['source']
-    db_source, created = Source.objects.get_or_create(source_id=source_id,
-                                                      issn_print=issn_print,
-                                                      issn_electronic=issn_electronic)
-
+    db_source, created = Source.get_or_create(source_id=source_id,
+                                              issn_print=issn_print,
+                                              issn_electronic=issn_electronic)
     if created:
         db_source.source_type = smart_str(source_type)
         db_source.source_title = smart_str(source_title)

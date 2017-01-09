@@ -15,6 +15,16 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
+            name='Abstract',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('abstract', models.CharField(default=b'', help_text=b'The article abstract', max_length=1000)),
+            ],
+            options={
+                'db_table': 'abstract',
+            },
+        ),
+        migrations.CreateModel(
             name='Authorship',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -46,15 +56,14 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Document',
             fields=[
-                ('eid', models.BigIntegerField(db_index=True, help_text='A unique identifier for the record; but see group_id', primary_key=True, serialize=False)),
-                ('doi', models.CharField(help_text='DOI', max_length=150, null=True)),
-                ('pub_year', models.IntegerField(db_index=True, default=-1, help_text='Publication year recorded in xocs:pub-year, backing off to xocs:sort-year where pub-year is unavailable')),
-                ('group_id', models.BigIntegerField(blank=True, db_index=True, help_text='An EID shared by likely duplicate doc entries', null=True)),
-                ('title', models.CharField(help_text='The original (untranslated) title', max_length=400)),
-                ('citation_count', models.IntegerField(default=0, help_text='Citation count from citedby.xml')),
-                ('title_language', models.CharField(default='', help_text='The language of the original title', max_length=5)),
-                ('abstract', models.CharField(default='', help_text='Abstract is not currently imported', max_length=1000)),
-                ('citation_type', models.CharField(choices=[('ab', 'ab = Abstract Report'), ('ar', 'ar = Article'), ('ba', 'ba'), ('bk', 'bk = Book'), ('br', 'br = Book Review'), ('bz', 'bz = Business Article'), ('cb', 'cb = Conference Abstract'), ('ch', 'ch = Chapter'), ('cp', 'cp = Conference Paper'), ('cr', 'cr = Conference Review'), ('di', 'di = Dissertation'), ('ed', 'ed = Editorial'), ('er', 'er = Erratum'), ('ip', 'ip = Article in Press'), ('le', 'le = Letter'), ('no', 'no = Note'), ('pa', 'pa = Patent'), ('pr', 'pr = Press Release'), ('re', 're = Review'), ('rf', 'rf'), ('rp', 'rp = Report'), ('sh', 'sh = Short Survey'), ('wp', 'wp = Working Paper')], default='', help_text='The type of document', max_length=5)),
+                ('eid', models.BigIntegerField(help_text=b'A unique identifier for the record; but see group_id', serialize=False, primary_key=True, db_index=True)),
+                ('doi', models.CharField(help_text=b'DOI', max_length=150, null=True)),
+                ('pub_year', models.IntegerField(default=-1, help_text=b'Publication year recorded in xocs:pub-year, backing off to xocs:sort-year where pub-year is unavailable', db_index=True)),
+                ('group_id', models.BigIntegerField(help_text=b'An EID shared by likely duplicate doc entries', null=True, db_index=True, blank=True)),
+                ('title', models.CharField(help_text=b'The original (untranslated) title', max_length=400)),
+                ('citation_count', models.IntegerField(default=0, help_text=b'Citation count from citedby.xml')),
+                ('title_language', models.CharField(default=b'', help_text=b'The language of the original title', max_length=5)),
+                ('citation_type', models.CharField(default=b'', help_text=b'The type of document', max_length=5, choices=[(b'ab', b'ab = Abstract Report'), (b'ar', b'ar = Article'), (b'ba', b'ba'), (b'bk', b'bk = Book'), (b'br', b'br = Book Review'), (b'bz', b'bz = Business Article'), (b'cb', b'cb = Conference Abstract'), (b'ch', b'ch = Chapter'), (b'cp', b'cp = Conference Paper'), (b'cr', b'cr = Conference Review'), (b'di', b'di = Dissertation'), (b'ed', b'ed = Editorial'), (b'er', b'er = Erratum'), (b'ip', b'ip = Article in Press'), (b'le', b'le = Letter'), (b'no', b'no = Note'), (b'pa', b'pa = Patent'), (b'pr', b'pr = Press Release'), (b're', b're = Review'), (b'rf', b'rf'), (b'rp', b'rp = Report'), (b'sh', b'sh = Short Survey'), (b'wp', b'wp = Working Paper')])),
             ],
             options={
                 'db_table': 'document',
@@ -100,5 +109,10 @@ class Migration(migrations.Migration):
             model_name='authorship',
             name='document',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Scopus.Document'),
+        ),
+        migrations.AddField(
+            model_name='abstract',
+            name='document',
+            field=models.ForeignKey(to='Scopus.Document'),
         ),
     ]

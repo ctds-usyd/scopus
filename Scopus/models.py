@@ -1,5 +1,5 @@
-from django.db import models
-
+from django.db import models, transaction
+from django.core.exceptions import MultipleObjectsReturned
 
 # class Keywords(models.Model):
 #     keyword = models.CharField(max_length=30)
@@ -23,10 +23,30 @@ class Source(models.Model):
                                               ('n', 'n = Newsletter'),
                                               ('w', 'w = Newspaper'),
                                               ])
-    source_title = models.CharField(max_length=350, null=False, blank=False)
-    source_abbrev = models.CharField(max_length=150, null=False, blank=False)
+    source_title = models.CharField(max_length=400, null=False, blank=False)
+    source_abbrev = models.CharField(max_length=200, null=False, blank=False)
     issn_print = models.CharField(max_length=15, null=True, blank=False, db_index=True)
     issn_electronic = models.CharField(max_length=15, null=True, blank=False, db_index=True)
+
+    @classmethod
+    @transaction.atomic
+    def get_or_create(cls, source_id, issn_print, issn_electronic):
+        """
+        To avoid creating multiple similar records by more than one thread.
+        Note: get_or_create method in Django is not thread safe:
+        http://stackoverflow.com/questions/6416213/is-get-or-create-thread-safe
+        http://stackoverflow.com/questions/2235318/how-do-i-deal-with-this-race-condition-in-django
+        """
+        try:
+            obj, created = cls.objects.get_or_create(source_id=source_id,
+                                                     issn_print=issn_print,
+                                                     issn_electronic=issn_electronic)
+        except MultipleObjectsReturned:
+            created = False
+            obj = cls.objects.get(source_id=source_id,
+                                  issn_print=issn_print,
+                                  issn_electronic=issn_electronic)
+        return obj, created
 
     def _type_label(self):
         return dict(self._meta.get_field('source_type').choices)[self.source_type]
@@ -50,15 +70,13 @@ class Document(models.Model):
     group_id = models.BigIntegerField(db_index=True, null=True, blank=True,
                                       help_text='An EID shared by likely duplicate doc entries')
     # keywords = models.ManyToManyField(Keywords)
-    title = models.CharField(max_length=400, null=False, blank=False,
+    title = models.CharField(max_length=500, null=False, blank=False,
                              help_text='The original (untranslated) title')
     source = models.ForeignKey(Source, blank=True, null=True,
                                db_index=True, help_text='Where the document is published')
     citation_count = models.IntegerField(default=0, help_text='Citation count from citedby.xml')
     title_language = models.CharField(max_length=5, default='',
                                       help_text='The language of the original title')
-    abstract = models.CharField(max_length=1000, default='',
-                                help_text='Abstract is not currently imported')
     citation_type = models.CharField(max_length=5, default='',
                                      help_text='The type of document',
                                      choices=[
@@ -141,3 +159,12 @@ class Citation(models.Model):
 
     def __str__(self):
         return '<{} cited {}>'.format(self.cite_from, self.cite_to)
+
+
+class Abstract(models.Model):
+    class Meta:
+        db_table = 'abstract'
+
+    document = models.ForeignKey(Document, null=False, db_index=True)
+    abstract = models.CharField(max_length=10000, default='',
+                                help_text='The article abstract')

@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = <SECRET_KEY>
+SECRET_KEY = '<SECRET_KEY>'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -72,10 +72,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Scopus.wsgi.application'
 
-
-DATABASE_NAME = 'DATABASE_NAME'
-DATABASE_USER = 'DATABASE_USER'
-PASSWORD = 'PASSWORD'
+# Put these values in ~/.profile
+DATABASE_NAME = os.environ.get('DATABASE_NAME')
+DATABASE_USER = os.environ.get('DATABASE_USER')
+PASSWORD = os.environ.get('PASSWORD')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',

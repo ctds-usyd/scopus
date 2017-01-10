@@ -85,7 +85,7 @@ def aggregate_records(item):
         db_source.save()
 
     documents.append(Document(eid=eid,
-                              doi=document['doi'],
+                              doi=smart_str(document['doi']),
                               group_id=document['group-id'],
                               title=smart_str(document['title']),
                               source=db_source,

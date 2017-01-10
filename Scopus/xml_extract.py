@@ -70,8 +70,6 @@ def int_or_none(x):
 
 
 def _get_data_from_doc(document, eid):
-    # TODO: catch and log all other exceptions
-
     def doc_get_one(path, **kwargs):
         return xpath_get_one(document, path, context={'eid': eid}, **kwargs)
 

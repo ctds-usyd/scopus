@@ -126,7 +126,8 @@ def _get_data_from_doc(document, eid):
             seq = xpath_get_one(author, '@seq', context=author_context, default=1, warn_zero=False)
             if seq == '':
                 seq = 1
-                n_authors = len(document.xpath('/xocs:doc/xocs:item/item/bibrecord/head//author'))
+                n_authors = len(document.xpath('/xocs:doc/xocs:item/item/bibrecord/head//author',
+                                               namespaces=NAMESPACES))
                 json_log(context=author_context, error='Found empty string in `seq` attribute. Setting to 1',
                          n_author_nodes=n_authors)
             surname = clean_text(xpath_get_one(author, './ce:surname', context=author_context))

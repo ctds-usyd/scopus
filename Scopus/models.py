@@ -147,6 +147,9 @@ class ItemID(models.Model):
     item_type = models.CharField(max_length=40,
                                  help_text='ItemID type (see Scopus documentation)')
 
+    def __str__(self):
+        return '<itemid[{}] for {}>'.format(self.item_type, self.document)
+
 
 class Citation(models.Model):
     class Meta:
@@ -168,3 +171,6 @@ class Abstract(models.Model):
     document = models.ForeignKey(Document, null=False, db_index=True)
     abstract = models.CharField(max_length=10000, default='',
                                 help_text='The article abstract')
+    
+    def __str__(self):
+        return '<abstract for {}, {} chars>'.format(self.document, len(self.abstract))

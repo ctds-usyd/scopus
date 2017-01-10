@@ -8,9 +8,9 @@ class Source(models.Model):
     """A unique publication venue with respect to Scopus's source ID."""
     class Meta:
         db_table = 'source'
-        unique_together = ('source_id', 'issn_print', 'issn_electronic')
+        unique_together = ('scopus_source_id', 'issn_print', 'issn_electronic')
 
-    source_id = models.BigIntegerField(default=-1, null=False, blank=False,
+    scopus_source_id = models.BigIntegerField(default=-1, null=False, blank=False,
                                        db_index=True, help_text="Scopus's srcid")
     source_type = models.CharField(max_length=1, db_index=True, null=True, help_text="Source type",
                                    choices = [('b', 'b = Book'),
@@ -52,7 +52,7 @@ class Source(models.Model):
         return dict(self._meta.get_field('source_type').choices)[self.source_type]
 
     def __str__(self):
-        return '<source[{}] {}: {}>'.format(self._type_label(), self.source_id, self.source_title)
+        return '<source[{}] {}: {}>'.format(self._type_label(), self.scopus_source_id, self.source_title)
 
 
 class Document(models.Model):

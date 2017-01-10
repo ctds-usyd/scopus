@@ -68,13 +68,14 @@ def aggregate_records(item):
     for item_name, item_id in document['itemid'].items():
         itemids.append(truncate_fields(ItemID(document_id=eid, item_id=item_id, item_type=item_name)))
 
-    (source_id,
+    (scopus_source_id,
      source_title,
      source_abbrev,
      source_type,
      issn_print,
      issn_electronic) = document['source']
-    db_source, created = Source.get_or_create(source_id=source_id,
+    # NOTE: this table has a separate unique primary key
+    db_source, created = Source.get_or_create(scopus_source_id=scopus_source_id,
                                               issn_print=issn_print,
                                               issn_electronic=issn_electronic)
     if created:

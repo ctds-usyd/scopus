@@ -85,14 +85,15 @@ We use **Scopus IDs** where we can, notably:
 * `Document.eid` (the table's primary key) is the document's EID
 * `Document.group_id`, to our understanding is used when Elsevier discovers
   that multiple EIDs correspond to the same document.
-* `Source.source_id` (the table's primary key) is Elsevier's ID for a source (`srcid`)
+* `Source.scopus_source_id` is Elsevier's ID for a source (`srcid`)
 * `Authorship.author_id` is Elsevier's ID for an author (`auid`)
 * `Authorship.affiliation_id` is Elsevier's ID for an affiliation (`afid`)
 
 While we tend to avoid explicit foriegn keys to avoid database overhead, the
 following **relationships** hold between tables:
 
-* `Document.source_id` refers to `Source.source_id`
+* `Document.source_id` refers to `Source.id`
+  (NOTE: *not* `Source.scopus_source_id`)
 * `Authorship.document_id` refers to `Document.eid`
 * `ItemID.document_id` refers to `Document.eid`
 * `Citation.cite_to` refers to `Document.eid`
@@ -126,9 +127,10 @@ CREATE TABLE "document" (
 In order to keep the `Source` table simple, we do not include many details,
 such as volume and issue number, or ISBN for monographs.
 
-We also store at most one print and electronic ISSN on each `Source` record,
-although it is *possible* that there are multiple ISSNs for each Scopus
-`source_id`.
+We also store at most one print and electronic ISSN on each `Source` record.
+Since a single journal may have, for instance, changed names over time, and
+hence may have multiple ISSNs over time, there may be multiple `Source`
+records for what Scopus considers a single source ID.
 
 ### Multiple authorship
 

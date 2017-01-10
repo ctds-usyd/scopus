@@ -18,6 +18,13 @@ def _field_names(model):
     return [field.name for field in model._meta.get_fields() if not field.related_model]
 
 
+class AbstractInline(admin.TabularInline):
+    extra = 0
+    can_delete = False
+    show_change_link = False
+    model = models.Abstract
+
+
 class AuthorshipInline(admin.TabularInline):
     extra = 0
     can_delete = False
@@ -36,8 +43,9 @@ class ItemIDInline(admin.TabularInline):
 class DocumentAdmin(admin.ModelAdmin):
     readonly_fields = _field_names(models.Document)
     inlines = [
-        ItemIDInline,
+        AbstractInline,
         AuthorshipInline,
+        ItemIDInline,
     ]
     search_fields = ('eid', 'title', 'authorship__surname')
 

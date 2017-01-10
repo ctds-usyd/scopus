@@ -239,7 +239,7 @@ Starting development server at http://127.0.0.1:8000/
 Quit the server with CONTROL-C.
 ```
 
-Open `http://127.0.0.1:8000/admin` to browse.
+Open `http://127.0.0.1:8000/` to browse.
 
 ## Authors
 

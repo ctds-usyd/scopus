@@ -30,7 +30,7 @@ class Source(models.Model):
 
     @classmethod
     @transaction.atomic
-    def get_or_create(cls, source_id, issn_print, issn_electronic):
+    def get_or_create(cls, scopus_source_id, issn_print, issn_electronic):
         """
         To avoid creating multiple similar records by more than one thread.
         Note: get_or_create method in Django is not thread safe:
@@ -38,12 +38,12 @@ class Source(models.Model):
         http://stackoverflow.com/questions/2235318/how-do-i-deal-with-this-race-condition-in-django
         """
         try:
-            obj, created = cls.objects.get_or_create(source_id=source_id,
+            obj, created = cls.objects.get_or_create(scopus_source_id=scopus_source_id,
                                                      issn_print=issn_print,
                                                      issn_electronic=issn_electronic)
         except MultipleObjectsReturned:
             created = False
-            obj = cls.objects.get(source_id=source_id,
+            obj = cls.objects.get(source_id=scopus_source_id,
                                   issn_print=issn_print,
                                   issn_electronic=issn_electronic)
         return obj, created

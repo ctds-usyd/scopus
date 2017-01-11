@@ -1,8 +1,9 @@
-from django.db import models, transaction
+from django.db import models, transaction, IntegrityError
 from django.core.exceptions import MultipleObjectsReturned
 
 # class Keywords(models.Model):
 #     keyword = models.CharField(max_length=30)
+
 
 class Source(models.Model):
     """A unique publication venue with respect to Scopus's source ID."""
@@ -41,7 +42,7 @@ class Source(models.Model):
             obj, created = cls.objects.get_or_create(scopus_source_id=scopus_source_id,
                                                      issn_print=issn_print,
                                                      issn_electronic=issn_electronic)
-        except MultipleObjectsReturned:
+        except (MultipleObjectsReturned, IntegrityError):
             created = False
             obj = cls.objects.get(source_id=scopus_source_id,
                                   issn_print=issn_print,

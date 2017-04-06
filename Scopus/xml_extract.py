@@ -99,7 +99,7 @@ def _get_data_from_doc(document, eid):
         'title': clean_text(doc_get_one('/xocs:doc/xocs:item/item/bibrecord/head/citation-title/titletext[@original="y"]')),
         'citation_type': doc_get_one('/xocs:doc/xocs:item/item/bibrecord/head/citation-info/citation-type/@*', default = ''),
         'title_language': doc_get_one('/xocs:doc/xocs:item/item/bibrecord/head/citation-title/titletext[@original="y"]/@xml:lang',
-                                      default='und'),  # language undetermined as per http://www.loc.gov/standards/iso639-2/faq.html#25
+                                      default='und') or 'und',  # language undetermined as per http://www.loc.gov/standards/iso639-2/faq.html#25
         'abstract': clean_text(abstract_node),
         'doi': _handle_unicode(doi_node),
     }

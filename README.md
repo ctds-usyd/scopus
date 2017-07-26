@@ -4,6 +4,7 @@
 
 ### Dependencies
 
+* a Bash terminal
 * Python 2.7 or >=3.3
 * MySQL
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import argparse
 import logging
 import multiprocessing
 import sys
@@ -284,7 +285,15 @@ class Process(multiprocessing.Process):
         extract_and_load_docs(self.path)
         json_log(info='Processing of {} took {} seconds'.format(self.path, time.time() - start))
 
-if __name__ == '__main__':
-    paths = sys.argv[1:]
-    for path in paths:
+
+def main():
+    ap = argparse.ArgumentParser('Extract Scopus snapshot to database')
+    ap.add_argument('paths', nargs='+',
+                    help='Scopus XML files or directories, zips or tars thereof')
+    args = ap.parse_args()
+    for path in args.paths:
         Process(path).start()
+
+
+if __name__ == '__main__':
+    main()

@@ -8,6 +8,7 @@ The below documentation describes running the tool and the schema of the databas
 
 The loading script should ideally be on the same machine as the source data,
 which can remain zipped (but not encrypted; see below) for the process to run.
+If it is not on the same machine, it should be mounted/mapped locally.
 
 The loading script need not be on the same machine as the target database.
 

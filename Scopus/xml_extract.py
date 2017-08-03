@@ -129,7 +129,8 @@ def _get_data_from_doc(document, eid):
     authors_list = defaultdict(dict)
     for authors_group in authors_groups:
         affiliation = xpath_get_one(authors_group, './/affiliation', context={'eid': eid}, warn_zero=False)
-        department, organization, country, city = '', '', '', ''
+        country, city = '', ''
+        organization_lines = []
         afid = None
         try:
             if affiliation is not None:
@@ -137,8 +138,7 @@ def _get_data_from_doc(document, eid):
                 country = affiliation.get('country', '')
                 city = affiliation.get('city', '')
                 organization_list = affiliation.findall('organization')
-                organization = clean_text(organization_list[-1]) if organization_list else ''
-                department = clean_text(organization_list[-2]) if len(organization_list) > 1 else ''
+                organization_lines = [clean_text(el) for el in organization_list]
         except Exception as e:
             json_log(context={'eid': eid, 'afid': afid}, exception=True)
 
@@ -156,7 +156,7 @@ def _get_data_from_doc(document, eid):
             surname = clean_text(xpath_get_one(author, './ce:surname', context=author_context))
             initials_node = xpath_get_one(author, './ce:initials', context=author_context, warn_zero=False)
             initials = clean_text(initials_node) if initials_node is not None else None
-            authors_list[author_id, initials, surname, seq][afid] = (department, organization, country, city)
+            authors_list[author_id, initials, surname, seq][afid] = (organization_lines, country, city)
 
     if len(set(seq for _, _, _, seq in authors_list)) < len(authors_list):
         # Happens quite frequently, with multiple alternative name extractions for same author

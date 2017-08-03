@@ -20,11 +20,14 @@ DATABASE_USER = os.environ.get('DATABASE_USER')
 PASSWORD = os.environ.get('PASSWORD')
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/tmp/scopus-hard.db',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': DATABASE_NAME,
+        'USER': DATABASE_USER,
+        'PASSWORD': PASSWORD,
+        'HOST': 'localhost',
+        'PORT': 3306,
     }
 }
-
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

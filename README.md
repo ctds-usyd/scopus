@@ -85,7 +85,7 @@ We use **Scopus IDs** where we can, notably:
 
 * `Document.eid` (the table's primary key) is the document's EID
 * `Document.group_id`, to our understanding is used when Elsevier discovers
-  that multiple EIDs correspond to the same document.
+  that multiple EIDs correspond to the same document. Usually, `group_id` and `eid` are identical. In practice, it might be good to ignore records with `eid` differing from `group_id`.
 * `Source.scopus_source_id` is Elsevier's ID for a source (`srcid`). It can, for instance be plugged into `https://www.scopus.com/sourceid/<scopus_source_id>` to get Elsevier's web-based representation of the source.
 * `Authorship.author_id` is Elsevier's ID for an author (`auid`)
 * `Authorship.affiliation_id` is Elsevier's ID for an affiliation (`afid`)

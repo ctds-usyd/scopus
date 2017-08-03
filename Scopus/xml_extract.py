@@ -136,7 +136,17 @@ def _get_data_from_doc(document, eid):
             if affiliation is not None:
                 afid = int_or_none(affiliation.get('afid'))
                 country = affiliation.get('country', '')
+                city_group = affiliation.get('city-group', '')
+                state = affiliation.get('state', '')
                 city = affiliation.get('city', '')
+                if not city:
+                    city = city_group
+                elif city_group:
+                    json_log(context={'eid': eid},
+                             error='city-group and city elements both present: '
+                                   'city={!r}, city-group={!r}'.format(city, city_group))
+                if state:
+                    city += ', ' + state
                 organization_list = affiliation.findall('organization')
                 organization_lines = [clean_text(el) for el in organization_list]
         except Exception as e:

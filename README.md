@@ -49,12 +49,12 @@ create one as following:
      * export DATABASE_NAME='<DATABASENAME>'
      * export DATABASE_USER='<DATABASE_USER>'
      * export PASSWORD='<PASSWORD>'
-* `./manage.py migrate  # set up DB tables`
+* `python manage.py migrate  # set up DB tables`
 
 ### Running
 
 * Ensure the data is decrypted and available in Zips.
-You can use the included script `batch_ungpg.sh` to do this easily.
+You can use the included script `batch_ungpg.sh` to do this easily in Linux/Unix.
 
 * `./extract_to_db.sh /path/to/zipfile1.zip /path/to/zipfile2.zip ...`
 
@@ -75,7 +75,7 @@ PostgreSQL, SQLite, etc.)
 The tables ("models" in Django terminology) we store are:
 
 * `Document`: an article with a unique Scopus EID
-* `Source`: where the document was published
+* `Source`: where the document was published (a particular journal, conference proceedings, etc.)
 * `Authorship`: authors, their order and affiliation
 * `ItemID`: list of alternative IDs registered for the docoument
 * `Citation`: which publications in the Scopus database cited a document
@@ -86,7 +86,7 @@ We use **Scopus IDs** where we can, notably:
 * `Document.eid` (the table's primary key) is the document's EID
 * `Document.group_id`, to our understanding is used when Elsevier discovers
   that multiple EIDs correspond to the same document.
-* `Source.scopus_source_id` is Elsevier's ID for a source (`srcid`)
+* `Source.scopus_source_id` is Elsevier's ID for a source (`srcid`). It can, for instance be plugged into `https://www.scopus.com/sourceid/<scopus_source_id>` to get Elsevier's web-based representation of the source.
 * `Authorship.author_id` is Elsevier's ID for an author (`auid`)
 * `Authorship.affiliation_id` is Elsevier's ID for an affiliation (`afid`)
 

@@ -130,7 +130,7 @@ class Authorship(models.Model):
     organization3 = models.CharField(max_length=300, default='', db_index=True,
                                      help_text='Name from 3rd organization node in affiliation details')
     country = models.CharField(max_length=10, null=False, blank=False)
-    city = models.CharField(max_length=30, help_text='Not currently stored')
+    city = models.CharField(max_length=100)
 
     def __str__(self):
         return '<{} {} ({}) is #{} author of <doc {}>>'.format(self.initials,

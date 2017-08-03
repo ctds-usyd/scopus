@@ -1,14 +1,78 @@
 # Elsevier Scopus custom data extraction and RDBMS export
 
+This tool extacts data from the Elsevier Scopus Snapshot XML to a more usable Relational Database Structure.
+
+The below documentation describes running the tool and the schema of the database.
+
 ## Setup and Running
 
-### Dependencies
+The loading script should ideally be on the same machine as the source data,
+which can remain zipped (but not encrypted; see below) for the process to run.
+
+The loading script need not be on the same machine as the target database.
+
+### Windows and MSSQL setup
+
+This presents running the loader Windows for a MSSQL instance. As an alternative, you could run the loader on a non-Windows machine using [`django-pyodbc`](https://pypi.python.org/pypi/django-pyodbc).
+
+#### Python setup
+
+The simplest way to install Python with libxml etc. is to [get Anaconda](https://www.continuum.io/downloads) for Python 2 ([version at time of writing](https://repo.continuum.io/archive/Anaconda2-4.4.0-Windows-x86_64.exe)). Install it and check the option to include Anaconda on the `PATH`.
+
+#### Loader setup
+
+[Download this repository](https://github.com/ctds-usyd/scopus/archive/master.zip)
+and extract it to a new directory, say `E:\scopus-extract`.
+
+In the command prompt, go to `E:\scopus-extract` and run
+
+```bash
+E:\scopus-extract> python setup.py install --inplace
+```
+
+#### Create tables in database
+
+* **Modify the DATABASES section of the file `~/scopus-extract/Scopus/settings.py` to reflect your MSSQL database instance.** For instance:
+
+  ```
+  DATABASES = {
+      'default': {
+          'ENGINE': 'sqlserver_ado',
+          'NAME': '<INSERT DB NAME>',
+          'USER': '<INSERT USER>',
+          'PASSWORD': '<INSERT PASSWORD>',
+          'HOST': '<INSERT HOST URL>',
+      }
+  }
+  ```
+
+* Run `python manage.py migrate` in the terminal to set up the DB tables
+
+
+#### Run the loading
+
+* Ensure the data is decrypted and available in Zips.
+
+* If all the zipped scopus data is in a directory `E:\path\to\scopus-data` you can simply use:
+  `extract_to_db.bat E:\path\to\scopus-data`.
+
+* Tips:
+
+    * you could also specify the individual Zip files instead of their containing directory
+    * you should log the output to a file
+
+### Linux/Unix and MySQL setup
+
+#### Requirements
+
+You require the following in the loading environment:
 
 * a Bash terminal
 * Python 2.7 or >=3.3
-* MySQL
+* MySQL client libraries on the loading machine
+* libxml2
 
-### MySQL setup
+#### MySQL setup
 
 * Create a database in MySQL shell of the server
     * `create database <DATABASE_NAME> CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;`
@@ -18,49 +82,42 @@
     * `set global net_buffer_length=1000000;`
     * `set global max_allowed_packet=1000000000;`
 
-### Server
+#### Loader setup
 
-If there is a virtualenv on the server, type `workon <VENV_NAME>` in shell to start the VENV. Otherwise,
-create one as following:
+[Download this repository](https://github.com/ctds-usyd/scopus/archive/master.zip)
+and extract it to a new directory, say `~/scopus-extract`.
 
-* Install `pip`
-* Install python virtualenv as
-    * `pip install --upgrade virtualenv`
-    * `pip install --upgrade virtualenvwrapper` (if it gives error
-   add `--ignore-installed six` to the end of the line)
-    * In `~/.profile`, add
-        *  `export WORKON_HOME=$HOME/.virtualenvs`
-        *  `export PROJECT_HOME=$HOME/Projects`
-        *  `source /usr/local/bin/virtualenvwrapper.sh`
-    * Create `scopus` virtual environment (as an example)
-        * `mkvirtualenv scopus --python=$HOME/<LINK_TO_PYTHON>`
-    * In `~/.virtualenvs/scopus/bin/postactivate` add
-        * `cd <LINK_TO_THE_PROJECT_DIRECTORY>`
-    * Start virtual environment by typing `workon scopus`
+In `~/scopus-extract`, run
 
-### Install python packages
+```bash
+$ python setup.py install --inplace
+```
 
-* Start virtual environment by typing `workon scopus`
-* `pip install -r requirements.txt`
+#### Create tables in database
 
-### Create tables in database
+* **Modify the DATABASES section of the file `~/scopus-extract/Scopus/settings.py` to reflect your MySQL database instance.**
+* Run `python manage.py migrate` in the terminal to set up the DB tables
 
-* Define `DATABASE_NAME`, `DATABASE_USER` and `PASSWORD` as enviornment variables by adding it to `.profile`:
-     * export DATABASE_NAME='<DATABASENAME>'
-     * export DATABASE_USER='<DATABASE_USER>'
-     * export PASSWORD='<PASSWORD>'
-* `python manage.py migrate  # set up DB tables`
+#### Run the loading
 
-### Running
 
 * Ensure the data is decrypted and available in Zips.
 You can use the included script `batch_ungpg.sh` to do this easily in Linux/Unix.
 
-* `./extract_to_db.sh /path/to/zipfile1.zip /path/to/zipfile2.zip ...`
+* If all the zipped scopus data is in a directory `/path/to/scopus-data` you can simply use:
+  `./extract_to_db.sh /path/to/scopus-data`.
 
-  as an example is:
+* Tips:
 
-  `nohup ./extract_to_db.sh /home/compressed-scopus/2011/ > 2011.txt`
+    * you could also specify the individual Zip files instead of their containing directory
+    * you might want to use `nohup` to avoid the process closing when the session ends
+    * you should log the output to a file
+
+An example invocation:
+
+```bash
+$ nohup ./extract_to_db.sh /home/compressed-scopus/2011/ > 2011.txt
+```
 
 ## Schema
 

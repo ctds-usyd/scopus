@@ -136,7 +136,20 @@ def _get_data_from_doc(document, eid):
             if affiliation is not None:
                 afid = int_or_none(affiliation.get('afid'))
                 country = affiliation.get('country', '')
-                city = affiliation.get('city', '')
+                city_group = xpath_get_one(affiliation, './city-group/text()', context={'eid': eid}, warn_zero=False)
+                city = xpath_get_one(affiliation, './city/text()', context={'eid': eid}, warn_zero=False)
+                state = xpath_get_one(affiliation, './state/text()', context={'eid': eid}, warn_zero=False)
+                pcode = xpath_get_one(affiliation, './postal-code/text()', context={'eid': eid}, warn_zero=False)
+                if city is None:
+                    city = city_group or ''
+                elif city_group is not None:
+                    json_log(context={'eid': eid},
+                             error='city-group and city elements both present: '
+                                   'city={!r}, city-group={!r}'.format(city, city_group))
+                if state is not None:
+                    city += ', ' + state
+                if pcode is not None:
+                    city += pcode
                 organization_list = affiliation.findall('organization')
                 organization_lines = [clean_text(el) for el in organization_list]
         except Exception as e:

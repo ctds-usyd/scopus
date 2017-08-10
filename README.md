@@ -28,7 +28,7 @@ and extract it to a new directory, say `E:\scopus-extract`.
 In the command prompt, go to `E:\scopus-extract` and run
 
 ```bash
-E:\scopus-extract> python setup.py install --inplace
+E:\scopus-extract> pip install -e .
 ```
 
 #### Create tables in database
@@ -91,7 +91,7 @@ and extract it to a new directory, say `~/scopus-extract`.
 In `~/scopus-extract`, run
 
 ```bash
-$ python setup.py install --inplace
+$ pip install -e .
 ```
 
 #### Create tables in database

@@ -106,9 +106,7 @@ def setup_package():
               install_requires=[
                   'Django==1.8',
                   'lxml==3',
-                  'mysqlclient',
                   'python-dateutil',
-                  'django-mssql==1.8',
               ],
               )
     finally:

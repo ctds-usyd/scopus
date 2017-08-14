@@ -28,7 +28,7 @@ and extract it to a new directory, say `E:\scopus-extract`.
 In the command prompt, go to `E:\scopus-extract` and run
 
 ```bash
-E:\scopus-extract> pip install -e .
+E:\scopus-extract> pip install django-mssql==1.8 -e .
 ```
 
 #### Create tables in database
@@ -91,7 +91,7 @@ and extract it to a new directory, say `~/scopus-extract`.
 In `~/scopus-extract`, run
 
 ```bash
-$ pip install -e .
+$ pip install mysqlclient -e .
 ```
 
 #### Create tables in database

@@ -44,6 +44,10 @@ E:\scopus-extract> pip install django-mssql==1.8 --editable=.
           'USER': '<INSERT USER>',
           'PASSWORD': '<INSERT PASSWORD>',
           'HOST': '<INSERT HOST URL>',
+          'OPTIONS': {
+              'provider': 'SQLOLEDB',
+              'use_legacy_date_fields': 'True'
+          },
       }
   }
   ```

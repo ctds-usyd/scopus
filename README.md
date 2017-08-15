@@ -25,9 +25,10 @@ The simplest way to install Python with libxml etc. is to [get Anaconda](https:/
 [Download this repository](https://github.com/ctds-usyd/scopus/archive/master.zip)
 and extract it to a new directory, say `E:\scopus-extract`.
 
-In the command prompt, go to `E:\scopus-extract` and run
+In the command prompt, go to `E:\scopus-extract` and run the following two commands:
 
-```bash
+```
+E:\scopus-extract> conda install -y lxml
 E:\scopus-extract> pip install django-mssql==1.8 --editable=.
 ```
 

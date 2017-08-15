@@ -277,6 +277,8 @@ Records are stored in large batches, so progress reporting is infrequent.
 
 ## Viewing the data with Django-admin
 
+**This feature is currently disabled in order to handle the shambles of MSSQL support!**
+
 The data and its relationships can be viewed and searched using a largely automatic interface provided by django.
 
 After the data is loaded, first create a user:

@@ -60,11 +60,11 @@ E:\scopus-extract> pip install django-mssql==1.8 --editable=.
 * Ensure the data is decrypted and available in Zips.
 
 * If all the zipped scopus data is in a directory `E:\path\to\scopus-data` you can simply use:
-  `extract_to_db.bat -j <#WORKERS> E:\path\to\scopus-data`.
+  `extract_to_db.bat [-j #WORKERS] E:\path\to\scopus-data`.
 
 * Tips:
 
-	* `<#WORKERS>` should be replaced by the number of concurrent processors for
+	* `#WORKERS` should be replaced by the number of concurrent processors for
 	  XML extraction. It may, however, be faster to use a single worker and
 	  divide the data to be processed by parallel `extract_to_db` invocations.
     * you could also specify the individual Zip files instead of their containing directory
@@ -116,11 +116,11 @@ $ pip install mysqlclient --editable=.
 You can use the included script `batch_ungpg.sh` to do this easily in Linux/Unix.
 
 * If all the zipped scopus data is in a directory `/path/to/scopus-data` you can simply use:
-  `./extract_to_db.sh -j <#WORKERS> /path/to/scopus-data`.
+  `./extract_to_db.sh [-j #WORKERS] /path/to/scopus-data`.
 
 * Tips:
 
-	* `<#WORKERS>` should be replaced by the number of concurrent processors for
+	* `#WORKERS` should be replaced by the number of concurrent processors for
 	  XML extraction. It may, however, be faster to use a single worker and
 	  divide the data to be processed by parallel `extract_to_db` invocations.
     * you could also specify the individual Zip files instead of their containing directory

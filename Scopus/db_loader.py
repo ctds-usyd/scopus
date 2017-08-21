@@ -135,7 +135,7 @@ def aggregate_records(item):
 
 def create_queries_one_by_one(queries):
     """Creates objects in DB individually
-    
+
     Used when bulk create fails
     """
     # iterates over each query
@@ -309,9 +309,8 @@ def extract_and_load_docs(paths, pool=None):
 
 def main():
     ap = argparse.ArgumentParser('Extract Scopus snapshot to database')
-    ap.add_argument('-j', '--jobs', type=int,
-                    default=multiprocessing.cpu_count(),
-                    help='Number of concurrent workers. Default=#CPUs-2')
+    ap.add_argument('-j', '--jobs', type=int, default=1,
+                    help='Number of concurrent workers.')
     ap.add_argument('paths', nargs='+',
                     help='Scopus XML files or directories, zips or tars thereof')
     args = ap.parse_args()

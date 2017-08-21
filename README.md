@@ -60,12 +60,17 @@ E:\scopus-extract> pip install django-mssql==1.8 --editable=.
 * Ensure the data is decrypted and available in Zips.
 
 * If all the zipped scopus data is in a directory `E:\path\to\scopus-data` you can simply use:
-  `extract_to_db.bat E:\path\to\scopus-data`.
+  `extract_to_db.bat -j <#WORKERS> E:\path\to\scopus-data`.
 
 * Tips:
 
+	* `<#WORKERS>` should be replaced by the number of concurrent processors for
+	  XML extraction. It may, however, be faster to use a single worker and
+	  divide the data to be processed by parallel `extract_to_db` invocations.
     * you could also specify the individual Zip files instead of their containing directory
     * you should log the output to a file
+    * in case something breaks or needs to be stopped, it should be safe to run the
+      extraction multiple times on the same data
 
 ### Linux/Unix and MySQL setup
 
@@ -111,13 +116,18 @@ $ pip install mysqlclient --editable=.
 You can use the included script `batch_ungpg.sh` to do this easily in Linux/Unix.
 
 * If all the zipped scopus data is in a directory `/path/to/scopus-data` you can simply use:
-  `./extract_to_db.sh /path/to/scopus-data`.
+  `./extract_to_db.sh -j <#WORKERS> /path/to/scopus-data`.
 
 * Tips:
 
+	* `<#WORKERS>` should be replaced by the number of concurrent processors for
+	  XML extraction. It may, however, be faster to use a single worker and
+	  divide the data to be processed by parallel `extract_to_db` invocations.
     * you could also specify the individual Zip files instead of their containing directory
     * you might want to use `nohup` to avoid the process closing when the session ends
     * you should log the output to a file
+    * in case something breaks or needs to be stopped, it should be safe to run the
+      extraction multiple times on the same data
 
 An example invocation:
 

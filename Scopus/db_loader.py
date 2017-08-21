@@ -9,6 +9,7 @@ import time
 import os
 import tarfile
 import zipfile
+import itertools
 
 import django
 from django.utils.encoding import smart_str
@@ -221,10 +222,27 @@ def generate_xml_pairs(path):
             backlog[key] = (path, xml)
 
     if backlog:
-        json_log(error='Found unpaired XML files: %s' % [path for path, _ in backlog.values()], exception=True)
+        json_log(error='Found unpaired XML files: %s'
+                 % [path for path, _ in backlog.values()],
+                 exception=True)
 
 
-def extract_and_load_docs(path):
+def _process_one(tup):
+    path, doc_file, citedby_file = tup
+    item = {'document': extract_document_information(doc_file),
+            'citation': extract_document_citations(citedby_file)}
+
+    if item['document'] is not None:
+        return aggregate_records(item)
+
+
+try:
+    basestring
+except NameError:
+    basestring = str
+
+
+def extract_and_load_docs(paths, pool=None):
     """Main driver for loading all XML from a path to a database
 
     Parameters
@@ -234,6 +252,20 @@ def extract_and_load_docs(path):
         This can either be a directory to be recursed (containing XML or Zip or
         TAR), or a single Zip or TAR file.
     """
+    if isinstance(paths, basestring):
+        paths = [paths]
+
+    xml_pairs = itertools.chain.from_iterable(generate_xml_pairs(path)
+                                              for path in paths)
+
+    if pool is None:
+        try:
+            from itertools import imap
+        except ImportError:
+            imap = map
+    else:
+        imap = pool.imap_unordered
+
     counter = -1
     itemid_batch = []
     authorship_batch = []
@@ -241,7 +273,7 @@ def extract_and_load_docs(path):
     citation_batch = []
     abstract_batch = []
 
-    for counter, (path, doc_file, citedby_file) in enumerate(generate_xml_pairs(path)):
+    for counter, item in enumerate(imap(_process_one, xml_pairs)):
         if counter % MAX_BATCH_SIZE == 0:
             if counter > 0:
                 logging.info('Saving after %d records' % counter)
@@ -254,16 +286,15 @@ def extract_and_load_docs(path):
             citation_batch = []
             abstract_batch = []
 
-        item = {'document': extract_document_information(doc_file),
-                'citation': extract_document_citations(citedby_file)}
+        if item is None:
+            continue
 
-        if item['document'] is not None:
-            (itemids, authorships, citations, documents, abstracts) = aggregate_records(item)
-            itemid_batch.extend(itemids)
-            authorship_batch.extend(authorships)
-            citation_batch.extend(citations)
-            document_batch.extend(documents)
-            abstract_batch.extend(abstracts)
+        (itemids, authorships, citations, documents, abstracts) = item
+        itemid_batch.extend(itemids)
+        authorship_batch.extend(authorships)
+        citation_batch.extend(citations)
+        document_batch.extend(documents)
+        abstract_batch.extend(abstracts)
 
     if counter < 0:
         json_log(error='Processed 0 records!', exception=True)
@@ -271,29 +302,32 @@ def extract_and_load_docs(path):
 
     # At end of the year, flush out all remaining records
     logging.info('Saving after %d records' % counter)
-    load_to_db(itemid_batch, authorship_batch, citation_batch, document_batch, abstract_batch)
+    load_to_db(itemid_batch, authorship_batch, citation_batch,
+               document_batch, abstract_batch)
     logging.info('Done')
-
-
-class Process(multiprocessing.Process):
-    def __init__(self, path):
-        super(Process, self).__init__()
-        self.path = path
-
-    def run(self):
-        json_log(info='Started {}'.format(self.path))
-        start = time.time()
-        extract_and_load_docs(self.path)
-        json_log(info='Processing of {} took {} seconds'.format(self.path, time.time() - start))
 
 
 def main():
     ap = argparse.ArgumentParser('Extract Scopus snapshot to database')
+    ap.add_argument('-j', '--jobs', type=int,
+                    default=multiprocessing.cpu_count(),
+                    help='Number of concurrent workers. Default=#CPUs-2')
     ap.add_argument('paths', nargs='+',
                     help='Scopus XML files or directories, zips or tars thereof')
     args = ap.parse_args()
-    for path in args.paths:
-        Process(path).start()
+    FORMAT = "%(asctime)-15s %(message)s"
+    logging.basicConfig(format=FORMAT)
+    logging.info('Extracting from XML in %d processes' % max(1, args.jobs))
+    if args.jobs > 1:
+        pool = multiprocessing.Pool(processes=args.jobs)
+    else:
+        pool = None
+
+    extract_and_load_docs(args.paths)
+
+    if pool is not None:
+        pool.close()
+        pool.join()
 
 
 if __name__ == '__main__':

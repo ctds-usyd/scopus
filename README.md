@@ -34,7 +34,7 @@ E:\scopus-extract> pip install django-mssql==1.8 --editable=.
 
 #### Create tables in database
 
-* **Modify the DATABASES section of the file `~/scopus-extract/Scopus/settings.py` to reflect your MSSQL database instance.** For instance:
+* **Modify the file `~/scopus-extract/Scopus/db_settings.py` to reflect your MSSQL database instance.** For instance:
 
   ```
   DATABASES = {
@@ -106,7 +106,7 @@ $ pip install mysqlclient --editable=.
 
 #### Create tables in database
 
-* **Modify the DATABASES section of the file `~/scopus-extract/Scopus/settings.py` to reflect your MySQL database instance.**
+* **Modify the file `~/scopus-extract/Scopus/db_settings.py` to reflect your MySQL database instance.**
 * Run `python manage.py migrate` in the terminal to set up the DB tables
 
 #### Run the loading

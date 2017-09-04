@@ -104,7 +104,7 @@ def setup_package():
               version=get_version_info()[0],
               packages=find_packages(),
               install_requires=[
-                  'Django==1.8',
+                  'Django~=1.8.1',
                   'lxml>=3',
                   'python-dateutil',
               ],

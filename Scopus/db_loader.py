@@ -322,7 +322,7 @@ def main():
     else:
         pool = None
 
-    extract_and_load_docs(args.paths)
+    extract_and_load_docs(args.paths, pool=pool)
 
     if pool is not None:
         pool.close()

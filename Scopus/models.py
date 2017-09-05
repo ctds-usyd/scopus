@@ -147,7 +147,11 @@ class ItemID(models.Model):
                                  help_text='ItemID type (see Scopus documentation)')
 
     def __str__(self):
-        return '<itemid[{}] for {}>'.format(self.item_type, self.document)
+        try:
+            doc = self.document
+        except Exception:
+            doc = self.document_id
+        return '<itemid[{}] for {}>'.format(self.item_type, doc)
 
 
 class Citation(models.Model):
@@ -170,6 +174,10 @@ class Abstract(models.Model):
     document = models.ForeignKey(Document, null=False, db_index=True)
     abstract = models.TextField(max_length=10000, default='',
                                 help_text='The article abstract')
-    
+
     def __str__(self):
-        return '<abstract for {}, {} chars>'.format(self.document, len(self.abstract))
+        try:
+            doc = self.document
+        except Exception:
+            doc = self.document_id
+        return '<abstract for {}, {} chars>'.format(doc, len(self.abstract))

@@ -149,7 +149,7 @@ The tables ("models" in Django terminology) we store are:
 
 * `Document`: an article with a unique Scopus EID
 * `Source`: where the document was published (a particular journal, conference proceedings, etc.)
-* `Authorship`: authors, their order and affiliation
+* `Authorship`: authors, their order and affiliation. Note that the affiliation name is given as a text field with affiliations (e.g. department and university) separated by newline characters.
 * `ItemID`: list of alternative IDs registered for the docoument
 * `Citation`: which publications in the Scopus database cited a document
 * `Abstract`: the abstract fields of documents

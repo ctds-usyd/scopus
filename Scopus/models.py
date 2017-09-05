@@ -123,19 +123,15 @@ class Authorship(models.Model):
     surname = models.CharField(max_length=100, null=False, blank=False)
     order = models.PositiveIntegerField(default=0, help_text='1 for first author, etc. Can have multiple Authorship entries for one value of order.')
     affiliation_id = models.IntegerField(db_index=True, null=True, help_text="Scopus's afid")
-    organization1 = models.CharField(max_length=300, default='', db_index=True,
-                                     help_text='Name from 1st organization node in affiliation details')
-    organization2 = models.CharField(max_length=300, default='', db_index=True,
-                                     help_text='Name from 2nd organization node in affiliation details')
-    organization3 = models.CharField(max_length=300, default='', db_index=True,
-                                     help_text='Name from 3rd organization node in affiliation details')
+    affiliation = models.TextField(default='', db_index=True,
+                                    help_text='Text from all organization nodes, separated by newline characters')
     country = models.CharField(max_length=10, null=False, blank=False)
     city = models.CharField(max_length=100)
 
     def __str__(self):
         return '<{} {} ({}) is #{} author of <doc {}>>'.format(self.initials,
                                                          self.surname,
-                                                         self.organization,
+                                                         self.affiliation,
                                                          self.order,
                                                          self.document_id)
 

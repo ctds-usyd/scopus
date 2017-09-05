@@ -113,18 +113,17 @@ def aggregate_records(item):
     truncate_fields(abstracts[-1])
 
     for (author_id, initials, surname, order), affiliations in document['authors'].items():
-        for afid, (organization_lines, country, city) in affiliations.items():
-            kwargs = dict(('organization{}'.format(i+1), line)
-                          for i, line in enumerate(organization_lines))
+        for afid, (affiliation_lines, country, city) in affiliations.items():
             authorships.append(Authorship(author_id=author_id,
                                           initials=smart_str(initials),
                                           surname=smart_str(surname),
                                           order=order,
                                           document_id=int(eid),
                                           affiliation_id=afid,
+                                          affiliation='\n'.join(affiliation_lines),
                                           country=country,
                                           city=city,
-                                          **kwargs))
+                                          ))
             truncate_fields(authorships[-1])
 
     for citation in item['citation']['eid']:

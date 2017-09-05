@@ -123,8 +123,8 @@ class Authorship(models.Model):
     surname = models.CharField(max_length=100, null=False, blank=False)
     order = models.PositiveIntegerField(default=0, help_text='1 for first author, etc. Can have multiple Authorship entries for one value of order.')
     affiliation_id = models.IntegerField(db_index=True, null=True, help_text="Scopus's afid")
-    affiliation = models.TextField(default='', db_index=True,
-                                    help_text='Text from all organization nodes, separated by newline characters')
+    affiliation = models.TextField(default='',
+                                   help_text='Text from all organization nodes, separated by newline characters')
     country = models.CharField(max_length=10, null=False, blank=False)
     city = models.CharField(max_length=100)
 

@@ -108,9 +108,10 @@ def aggregate_records(item):
 
     truncate_fields(documents[-1])
 
-    abstracts.append(Abstract(document_id=eid,
-                              abstract=document['abstract']))
-    truncate_fields(abstracts[-1])
+    if document['abstract']:
+        abstracts.append(Abstract(document_id=eid,
+                                  abstract=document['abstract']))
+        truncate_fields(abstracts[-1])
 
     for (author_id, initials, surname, order), affiliations in document['authors'].items():
         for afid, (affiliation_lines, country, city) in affiliations.items():

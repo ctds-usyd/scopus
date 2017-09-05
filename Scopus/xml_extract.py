@@ -86,7 +86,11 @@ def _get_data_from_doc(document, eid):
         text = "".join(x for x in node.itertext())
         return _handle_unicode(text=re.sub('\s+', ' ', text).strip(), default=default)
 
-    abstract_node = doc_get_one('/xocs:doc/xocs:item/item/bibrecord/head/abstracts/abstract[@original="y"]//ce:para', warn_zero=False)
+    abstract_node = doc_get_one('/xocs:doc/xocs:item/item/bibrecord/head/abstracts/abstract[@original="y"]', warn_zero=False)
+    if abstract_node is None:
+        abstract_text = ''
+    else:
+        abstract_text = '\n'.join(map(clean_text, abstract_node.xpath('.//ce:para', namespaces=NAMESPACES)))
     pub_year = int(doc_get_one('/xocs:doc/xocs:meta/xocs:pub-year/text()', default=-1, warn_zero=False))
     if pub_year == -1:
         pub_year = int(doc_get_one('/xocs:doc/xocs:meta/xocs:sort-year/text()', default=-1))
@@ -100,7 +104,7 @@ def _get_data_from_doc(document, eid):
         'citation_type': doc_get_one('/xocs:doc/xocs:item/item/bibrecord/head/citation-info/citation-type/@*', default = ''),
         'title_language': doc_get_one('/xocs:doc/xocs:item/item/bibrecord/head/citation-title/titletext[@original="y"]/@xml:lang',
                                       default='und') or 'und',  # language undetermined as per http://www.loc.gov/standards/iso639-2/faq.html#25
-        'abstract': clean_text(abstract_node),
+        'abstract': abstract_text,
         'doi': _handle_unicode(doi_node),
     }
 

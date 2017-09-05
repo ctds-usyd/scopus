@@ -1,6 +1,6 @@
+Scopus/db_settings.py
 *.pyc
 *~
 .DS_Store
 .idea
 *-checkpoint.ipynb
-settings.py

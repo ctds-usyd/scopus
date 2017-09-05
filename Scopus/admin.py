@@ -58,11 +58,11 @@ class SourceAdmin(admin.ModelAdmin):
 
 @admin.register(models.Authorship)
 class AuthorshipAdmin(admin.ModelAdmin):
-    search_fields = ('surname', 'organization', 'author_id', 'affiliation_id')
+    search_fields = ('surname', 'affiliation', 'author_id', 'affiliation_id')
     readonly_fields = _field_names(models.Authorship)
     fields = (('author_id', 'document', 'order'),
               ('initials', 'surname'),
-              ('affiliation_id', 'organization', 'department'),
+              ('affiliation_id', 'affiliation', 'department'),
               ('country', 'city'))
 
 

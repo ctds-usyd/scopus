@@ -135,6 +135,22 @@ def aggregate_records(item):
     return itemids, authorships, citations, documents, abstracts
 
 
+def _with_retry(func, retries=3, wait=.1, wait_mul=2):
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception:
+            if not retries:
+                raise
+            time.sleep(wait)
+            return _with_retry(func,
+                               retries=retries - 1,
+                               wait=wait * wait_mul,
+                               wait_mul=wait_mul)(*args, **kwargs)
+    return wrapper
+
+
+@_with_retry
 def create_queries_one_by_one(queries):
     """Creates objects in DB individually
 
@@ -175,23 +191,25 @@ def load_to_db(itemids, authorships, citations, documents, abstracts):
 
 
 def _generate_files(path):
+    # XXX: Had some problems on windows with opening files. Will do so with
+    # retries.
     if os.path.isdir(path):
         for child in os.listdir(path):
             child = os.path.join(path, child)
             if child.endswith('.xml'):
-                yield child, open(child, 'rb')
+                yield child, _with_retry(open)(child, 'rb')
             else:
                 for tup in _generate_files(child):
                     yield tup
     elif tarfile.is_tarfile(path):
-        with tarfile.open(path, 'r') as archive:
+        with _with_retry(tarfile.open)(path, 'r') as archive:
             for info in archive:
                 yield info.path, archive.extractfile(info)
     elif zipfile.is_zipfile(path):
-        archive = zipfile.ZipFile(path, 'r')
+        archive = _with_retry(zipfile.ZipFile)(path, 'r')
         for info in archive.filelist:
             # zipfile cannot concurrently open multiple files :(
-            yield info.filename, archive.open(info)
+            yield info.filename, _with_retry(archive.open)(info)
 
 
 def generate_xml_pairs(path):

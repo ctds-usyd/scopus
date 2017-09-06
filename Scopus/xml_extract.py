@@ -27,7 +27,8 @@ NAMESPACES = {
 }
 
 
-def xpath_get_one(root, path, context=None, default=None, warn_zero=True):
+def xpath_get_one(root, path, context=None, default=None, warn_zero=True,
+                  warn_multi=True):
     """Match an XPath that is expected to return exactly one result
 
     Assures quality by logging when this expectation is violated, i.e. the
@@ -46,14 +47,18 @@ def xpath_get_one(root, path, context=None, default=None, warn_zero=True):
     warn_zero : boolean, default True
         Whether it is offensive for the query to return no results,
         and therefore a warning should be logged.
+    warn_multi : boolean, default True
+        Whether it is offensive for the query to select only the first of
+        multiple results, and therefore a warning should be logged.
     """
     out = root.xpath(path, namespaces=NAMESPACES)
     if len(out) == 1:
         return out[0]
     if len(out) > 1:
-        json_log(error='Got {} expected 1'.format(len(out)),
-                 xpath=path,
-                 context=context)
+        if warn_multi:
+            json_log(error='Got {} expected 1'.format(len(out)),
+                     xpath=path,
+                     context=context)
         return out[0]
     # Got zero
     if warn_zero:
@@ -102,8 +107,9 @@ def _get_data_from_doc(document, eid):
         'group-id': int(doc_get_one('/xocs:doc/xocs:meta/cto:group-id/text()')),
         'title': clean_text(doc_get_one('/xocs:doc/xocs:item/item/bibrecord/head/citation-title/titletext[@original="y"]')),
         'citation_type': doc_get_one('/xocs:doc/xocs:item/item/bibrecord/head/citation-info/citation-type/@*', default = ''),
+        # we don't warn for lang because we warn for the title
         'title_language': doc_get_one('/xocs:doc/xocs:item/item/bibrecord/head/citation-title/titletext[@original="y"]/@xml:lang',
-                                      default='und') or 'und',  # language undetermined as per http://www.loc.gov/standards/iso639-2/faq.html#25
+                                      default='und', warn_multi=False) or 'und',  # language undetermined as per http://www.loc.gov/standards/iso639-2/faq.html#25
         'abstract': abstract_text,
         'doi': _handle_unicode(doi_node),
     }

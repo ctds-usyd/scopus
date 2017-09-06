@@ -131,8 +131,8 @@ def _get_data_from_doc(document, eid):
                           clean_text(source.find('sourcetitle')),
                           clean_text(abbrev) if abbrev is not None else '',
                           xpath_get_one(source, './@type', context={'eid': eid, 'srcid': srcid}, warn_zero=False, default=''),
-                          xpath_get_one(source, './/issn[@type=\'print\']/text()', context={'eid': eid, 'srcid': srcid}, warn_zero=False),
-                          xpath_get_one(source, './/issn[@type=\'electronic\']/text()', context={'eid': eid, 'srcid': srcid}, warn_zero=False),
+                          xpath_get_one(source, './issn[@type=\'print\']/text()', context={'eid': eid, 'srcid': srcid}, warn_zero=False),
+                          xpath_get_one(source, './issn[@type=\'electronic\']/text()', context={'eid': eid, 'srcid': srcid}, warn_zero=False),
                           )
 
     authors_groups = document.xpath('/xocs:doc/xocs:item/item/bibrecord/head/author-group', namespaces=NAMESPACES)

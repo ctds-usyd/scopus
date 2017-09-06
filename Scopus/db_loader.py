@@ -11,6 +11,7 @@ import tarfile
 import zipfile
 import itertools
 import functools
+import warnings
 
 import django
 from django.utils.encoding import smart_str
@@ -323,6 +324,8 @@ def main():
     else:
         pool = None
 
+    warnings.filterwarnings('ignore', category=UnicodeWarning,
+                            module='.*sqlserver_ado.*')
     extract_and_load_docs(args.paths, pool=pool)
 
     if pool is not None:

@@ -60,7 +60,7 @@ E:\scopus-extract> pip install django-mssql==1.8 --editable=.
 * Ensure the data is decrypted and available in Zips.
 
 * If all the zipped scopus data is in a directory `E:\path\to\scopus-data` you can simply use:
-  `extract_to_db.bat [-j #WORKERS] E:\path\to\scopus-data`.
+  `extract_to_db.bat [-j #WORKERS] E:\path\to\scopus-data 2> logfile.txt`.
 
 * Tips:
 
@@ -132,7 +132,7 @@ You can use the included script `batch_ungpg.sh` to do this easily in Linux/Unix
 An example invocation:
 
 ```bash
-$ nohup ./extract_to_db.sh /home/compressed-scopus/2011/ > 2011.txt
+$ nohup ./extract_to_db.sh /home/compressed-scopus/2011/ 2> 2011.txt
 ```
 
 ## Schema

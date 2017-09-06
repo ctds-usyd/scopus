@@ -55,7 +55,8 @@ def xpath_get_one(root, path, context=None, default=None, warn_zero=True,
     if len(out) == 1:
         return out[0]
     if len(out) > 1:
-        if warn_multi:
+        # (a set of identical texts is innocuous)
+        if warn_multi and not len(set(out)) == 1:
             json_log(error='Got {} expected 1'.format(len(out)),
                      xpath=path,
                      context=context)

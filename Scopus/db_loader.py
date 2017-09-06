@@ -268,7 +268,7 @@ def extract_and_load_docs(paths, pool=None):
         except ImportError:
             imap = map
     else:
-        imap = functools.partial(pool.imap_unordered, chunksize=50)
+        imap = functools.partial(pool.imap_unordered, chunksize=200)
 
     counter = -1
     itemid_batch = []

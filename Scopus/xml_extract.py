@@ -110,7 +110,7 @@ def _get_data_from_doc(document, eid):
         'citation_type': doc_get_one('/xocs:doc/xocs:item/item/bibrecord/head/citation-info/citation-type/@*', default = ''),
         # we don't warn for lang because we warn for the title
         'title_language': doc_get_one('/xocs:doc/xocs:item/item/bibrecord/head/citation-title/titletext[@original="y"]/@xml:lang',
-                                      default='und', warn_multi=False) or 'und',  # language undetermined as per http://www.loc.gov/standards/iso639-2/faq.html#25
+                                      default='und', warn_multi=False, warn_zero=False) or 'und',  # language undetermined as per http://www.loc.gov/standards/iso639-2/faq.html#25
         'abstract': abstract_text,
         'doi': _handle_unicode(doi_node),
     }

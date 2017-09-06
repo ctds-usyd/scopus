@@ -135,7 +135,8 @@ def aggregate_records(item):
     return itemids, authorships, citations, documents, abstracts
 
 
-def _with_retry(func, retries=3, wait=.1, wait_mul=2):
+def _with_retry(func, retries=3, wait=1, wait_mul=5):
+    # By default, wait 1s, 5s, 25s, 125s
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)

@@ -10,6 +10,7 @@ import os
 import tarfile
 import zipfile
 import itertools
+import functools
 
 import django
 from django.utils.encoding import smart_str
@@ -264,7 +265,7 @@ def extract_and_load_docs(paths, pool=None):
         except ImportError:
             imap = map
     else:
-        imap = pool.imap_unordered
+        imap = functools.partial(pool.imap_unordered, chunksize=50)
 
     counter = -1
     itemid_batch = []

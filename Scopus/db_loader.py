@@ -205,8 +205,10 @@ def generate_xml_pairs(path):
     backlog = {}
     for path, f in _generate_files(path):
         if not path.endswith('.xml'):
+            f.close()
             continue
         xml = f.read()
+        f.close()
         key = os.path.dirname(path)
         if key in backlog:
             other_path, other_xml = backlog.pop(key)

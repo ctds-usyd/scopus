@@ -333,7 +333,7 @@ def extract_and_load_docs(paths, pool=None):
 def main():
     ap = argparse.ArgumentParser('Extract Scopus snapshot to database')
     ap.add_argument('-j', '--jobs', type=int, default=1,
-                    help='Number of concurrent workers.')
+                    help='Number of concurrent workers. FIXME: this appears to degrade performance significantly, at least on Windows')
     ap.add_argument('paths', nargs='+',
                     help='Scopus XML files or directories, zips or tars thereof')
     args = ap.parse_args()

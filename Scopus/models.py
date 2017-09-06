@@ -141,7 +141,7 @@ class ItemID(models.Model):
         db_table = 'itemid'
 
     document = models.ForeignKey(Document, null=False, db_index=True)
-    item_id = models.CharField(max_length=20, null=False, blank=False,
+    item_id = models.CharField(max_length=40, null=False, blank=False,
                                db_index=True, help_text='The identifier')
     item_type = models.CharField(max_length=40,
                                  help_text='ItemID type (see Scopus documentation)')

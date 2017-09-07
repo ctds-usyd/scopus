@@ -151,7 +151,6 @@ def _with_retry(func, retries=3, wait=1, wait_mul=5):
     return wrapper
 
 
-@_with_retry
 def create_queries_one_by_one(queries):
     """Creates objects in DB individually
 
@@ -160,7 +159,7 @@ def create_queries_one_by_one(queries):
     # iterates over each query
     for query in queries:
         try:
-            query.save()
+            _with_retry(query.save)()
         except Exception:
             json_log(error='Loading to database failed', context=str(query), exception=True)
 

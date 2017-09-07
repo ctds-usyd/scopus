@@ -161,7 +161,9 @@ def create_queries_one_by_one(queries):
         try:
             _with_retry(query.save)()
         except Exception:
-            json_log(error='Loading to database failed', context=str(query), exception=True)
+            json_log(error='Loading to database failed',
+                     context={'object': str(query)},
+                     exception=True)
 
 
 def bulk_create(queries):
@@ -251,11 +253,21 @@ def generate_xml_pairs(path):
 
 def _process_one(tup):
     path, doc_file, citedby_file = tup
-    item = {'document': extract_document_information(doc_file),
-            'citation': extract_document_citations(citedby_file)}
+    try:
+        item = {'document': extract_document_information(doc_file),
+                'citation': extract_document_citations(citedby_file)}
+    except Exception:
+        json_log(error='Uncaught error in extraction from XML',
+                 context={'path': path},
+                 exception=True)
 
     if item['document'] is not None:
-        return aggregate_records(item)
+        try:
+            return _with_retry(aggregate_records)(item)
+        except Exception:
+            json_log(error='Uncaught error in producing django records',
+                     context={'eid': item['document'].get('eid')},
+                     exception=True)
 
 
 try:

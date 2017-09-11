@@ -311,6 +311,28 @@ Quit the server with CONTROL-C.
 
 Open `http://127.0.0.1:8000/` to browse.
 
+## Advanced: Log analysis
+
+Most errors and warnings in the loader logs will be output with each log entry
+as a separate JSON object.  They can be analysed using UNIX tools and
+[jq](https://stedolan.github.io/jq/) or another tool for analysing JSON.
+
+The following will find the most frequent issues in the log files:
+
+```
+cat *.log | grep -o '{"context.*' |
+    jq -c 'del(.context) | del(.length) | del(.exception)' |
+    sort | uniq -c | sort -n
+```
+
+The following will print any exception tracebacks:
+
+```
+cat *.log | grep -o '{"context.*' |
+    jq -r 'select(.error == "Loading to database failed") |
+           "::\(. | del(.exception))::\n \(.exception)"'
+```
+
 ## Authors
 
-This package has been developed by Nikzad Babaii Rizvandi and Joel Nothman within the Sydney Informatics Hub. Copyright ©2016, University of Sydney.
+This package has been developed by Nikzad Babaii Rizvandi and Joel Nothman within the Sydney Informatics Hub. Copyright ©2016-2017, University of Sydney.

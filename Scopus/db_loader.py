@@ -14,7 +14,7 @@ import functools
 import warnings
 
 import django
-from django.utils.encoding import smart_str
+from django.utils.encoding import smart_str, smart_text
 import django.db
 
 django.setup()
@@ -72,7 +72,7 @@ def aggregate_records(item):
             if val is not None and len(val) > max_length:
                 json_log(error='Truncation of oversize {}.{} (max_length={})'.format(type(obj).__name__, name, max_length),
                          length=len(val),
-                         context={'eid': eid, 'obj': str(obj)})
+                         context={'eid': eid, 'obj': smart_text(obj)})
                 setattr(obj, name, val[:max_length])
 
         return obj  # allow chaining
@@ -162,7 +162,7 @@ def create_queries_one_by_one(queries):
             _with_retry(query.save)()
         except Exception:
             json_log(error='Loading to database failed',
-                     context={'object': str(query)},
+                     context={'object': smart_text(query)},
                      exception=True)
 
 

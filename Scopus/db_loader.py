@@ -159,7 +159,6 @@ def bulk_create(doc_records):
     ItemID.objects.bulk_create(sum(itemids, []))
     Authorship.objects.bulk_create(sum(authorships, []))
     Citation.objects.bulk_create(sum(citations, []))
-    raise ValueError()
     Abstract.objects.bulk_create(sum(abstracts, []))
 
 

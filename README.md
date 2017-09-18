@@ -2,6 +2,9 @@
 
 This tool extacts data from the Elsevier Scopus Snapshot XML to a more usable Relational Database Structure.
 
+The loader is incremental and atomically consistent, such that it should be possible to start, stop and restart extraction on the same dataset without making the documents stalled inconsistent.
+This incrementality, however, assumes that the documents and related data are fixed across restarts.
+
 The below documentation describes running the tool and the schema of the database.
 
 ## Setup and Running

@@ -171,7 +171,13 @@ def create_doc(doc_record):
 
 
 def load_to_db(doc_records):
-    """Save Django objects in bulk"""
+    """Save Django objects
+
+    Save referenced sources first, then attempt to bulk create
+    all documents and associated records atomically, falling
+    back to creating each document and associated records atomically.
+    """
+
     for doc_record in doc_records:
         doc = doc_record[0]
         source = doc.source

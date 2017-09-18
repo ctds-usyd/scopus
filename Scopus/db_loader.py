@@ -273,7 +273,7 @@ def generate_xml_pairs(path, eid_filter=None):
             backlog[key] = (path, xml)
 
     if n_skips:
-        json_log(info='Skipped %d files altogether' % n_skips,
+        json_log(info='Skipped %d files (two per doc) altogether' % n_skips,
                  method=logging.warning)
     if backlog:
         json_log(error='Found unpaired XML files: %s'
@@ -323,8 +323,9 @@ def extract_and_load_docs(paths, pool=None):
     def already_saved(eid):
         return Document.objects.filter(eid=eid).exists()
 
-    xml_pairs = itertools.chain.from_iterable(generate_xml_pairs(path, already_saved)
-                                              for path in paths)
+    xml_pairs = itertools.chain.from_iterable(
+        generate_xml_pairs(path, _with_retry(already_saved))
+        for path in paths)
 
     if pool is None:
         try:

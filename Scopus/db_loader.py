@@ -12,6 +12,7 @@ import zipfile
 import itertools
 import functools
 import warnings
+from collections import defaultdict
 
 import django
 from django.utils.encoding import smart_str, smart_text
@@ -87,21 +88,20 @@ def aggregate_records(item):
      issn_print,
      issn_electronic) = document['source']
     # NOTE: this table has a separate unique primary key
-    db_source, created = Source.get_or_create(scopus_source_id=scopus_source_id,
-                                              issn_print=issn_print,
-                                              issn_electronic=issn_electronic)
-    if created:
-        db_source.source_type = smart_str(source_type)
-        db_source.source_title = smart_str(source_title)
-        db_source.source_abbrev = smart_str(source_abbrev)
-        truncate_fields(db_source)
-        db_source.save()
+    source = Source(scopus_source_id=scopus_source_id,
+                    issn_print=issn_print,
+                    issn_electronic=issn_electronic,
+                    source_type=smart_str(source_type),
+                    source_title=smart_str(source_title),
+                    source_abbrev=smart_str(source_abbrev),
+                    )
+    truncate_fields(source)
 
     documents.append(Document(eid=eid,
                               doi=smart_str(document['doi']),
                               group_id=document['group-id'],
                               title=smart_str(document['title']),
-                              source=db_source,
+                              source=source,
                               citation_count=item['citation']['count'],
                               pub_year=document['pub-year'],
                               title_language=document['title_language'],
@@ -185,6 +185,15 @@ def bulk_create(queries):
 
 def load_to_db(itemids, authorships, citations, documents, abstracts):
     """Save Django objects in bulk"""
+    for doc in documents:
+        source = doc.source
+        db_source, created = Source.get_or_create(
+            scopus_source_id=source.scopus_source_id,
+            issn_print=source.issn_print,
+            issn_electronic=source.issn_electronic)
+        source.pk = db_source.pk
+        if created:
+            source.save()
     bulk_create(queries=documents)
     bulk_create(queries=itemids)
     bulk_create(queries=authorships)
@@ -263,7 +272,7 @@ def _process_one(tup):
 
     if item['document'] is not None:
         try:
-            return _with_retry(aggregate_records)(item)
+            return aggregate_records(item)
         except Exception:
             json_log(error='Uncaught error in producing django records',
                      context={'eid': item['document'].get('eid')},

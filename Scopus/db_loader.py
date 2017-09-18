@@ -187,10 +187,15 @@ def load_to_db(itemids, authorships, citations, documents, abstracts):
     """Save Django objects in bulk"""
     for doc in documents:
         source = doc.source
-        db_source, created = Source.get_or_create(
-            scopus_source_id=source.scopus_source_id,
-            issn_print=source.issn_print,
-            issn_electronic=source.issn_electronic)
+        try:
+            db_source, created = _with_retry(Source.get_or_create)(
+                scopus_source_id=source.scopus_source_id,
+                issn_print=source.issn_print,
+                issn_electronic=source.issn_electronic)
+        except Exception:
+            json_log(error='Loading to database failed',
+                     context={'object': source},
+                     exception=True)
         source.pk = db_source.pk
         if created:
             source.save()

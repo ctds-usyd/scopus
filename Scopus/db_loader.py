@@ -230,7 +230,7 @@ def _generate_files(path):
             yield info.filename, _with_retry(archive.open)(info)
 
 
-def generate_xml_pairs(path):
+def generate_xml_pairs(path, eid_filter=None):
     """Finds and returns contents for pairs of XML documents and citedby
 
     path may be:
@@ -238,9 +238,20 @@ def generate_xml_pairs(path):
         * a tar file
         * a zip file
     """
+    n_skips = 0
     backlog = {}
     for path, f in _generate_files(path):
         if not path.endswith('.xml'):
+            f.close()
+            continue
+
+        # TODO: filter before opening, or after pairing to avoid DB queries
+        if eid_filter is not None \
+           and eid_filter(int(os.path.dirname(path).rsplit('-')[-1])):
+            n_skips += 1
+            if n_skips % 100000 == 0:
+                json_log(info='Skipped %d files so far' % n_skips,
+                         method=logging.info)
             f.close()
             continue
         xml = f.read()
@@ -262,10 +273,14 @@ def generate_xml_pairs(path):
         else:
             backlog[key] = (path, xml)
 
+    if n_skips:
+        json_log(info='Skipped %d files altogether' % n_skips,
+                 method=logging.warning)
     if backlog:
         json_log(error='Found unpaired XML files: %s'
                  % [path for path, _ in backlog.values()],
-                 exception=True)
+                 exception=True,
+                 method=logging.error)
 
 
 def _process_one(tup):
@@ -306,7 +321,10 @@ def extract_and_load_docs(paths, pool=None):
     if isinstance(paths, basestring):
         paths = [paths]
 
-    xml_pairs = itertools.chain.from_iterable(generate_xml_pairs(path)
+    def already_saved(eid):
+        return Document.objects.filter(eid=eid).exists()
+
+    xml_pairs = itertools.chain.from_iterable(generate_xml_pairs(path, already_saved)
                                               for path in paths)
 
     if pool is None:
@@ -333,7 +351,7 @@ def extract_and_load_docs(paths, pool=None):
         doc_records.append(doc_record)
 
     if counter < 0:
-        json_log(error='Processed 0 records!', exception=True)
+        json_log(error='Processed 0 records!', method=logging.error)
         return
 
     # At end of the year, flush out all remaining records

@@ -17,6 +17,7 @@ from collections import defaultdict
 import django
 from django.utils.encoding import smart_str, smart_text
 import django.db
+from django.db import transaction
 
 django.setup()
 
@@ -132,7 +133,7 @@ def aggregate_records(item):
     for citation in item['citation']['eid']:
         citations.append(Citation(cite_to=eid, cite_from=citation))
 
-    return itemids, authorships, citations, documents, abstracts
+    return documents[-1], itemids, authorships, citations, abstracts
 
 
 def _with_retry(func, retries=3, wait=1, wait_mul=5):
@@ -151,41 +152,29 @@ def _with_retry(func, retries=3, wait=1, wait_mul=5):
     return wrapper
 
 
-def create_queries_one_by_one(queries):
-    """Creates objects in DB individually
-
-    Used when bulk create fails
-    """
-    # iterates over each query
-    for query in queries:
-        try:
-            _with_retry(query.save)()
-        except Exception:
-            json_log(error='Loading to database failed',
-                     context={'object': smart_text(query)},
-                     exception=True)
+@transaction.atomic
+def bulk_create(doc_records):
+    documents, itemids, authorships, citations, abstracts = zip(*doc_records)
+    Document.objects.bulk_create(documents)
+    ItemID.objects.bulk_create(sum(itemids, []))
+    Authorship.objects.bulk_create(sum(authorships, []))
+    Citation.objects.bulk_create(sum(citations, []))
+    raise ValueError()
+    Abstract.objects.bulk_create(sum(abstracts, []))
 
 
-def bulk_create(queries):
-    """Create all objects in the database
-
-    Objects in queries must all be of the same class
-    """
-    model = queries[0].__class__
-    try:
-        model.objects.bulk_create(queries)
-    except Exception:
-        # When transaction as bulk is failed, then go through each query
-        # one by one and create them. Also, log failed queries.
-        create_queries_one_by_one(queries=queries)
-
-    # Avoid memory leak when DEBUG == True
-    django.db.reset_queries()
+@transaction.atomic
+def create_doc(doc_record):
+    _with_retry(doc_record[0].save)()
+    for same_model_objs in doc_record[1:]:
+        for obj in same_model_objs:
+            _with_retry(obj.save)()
 
 
-def load_to_db(itemids, authorships, citations, documents, abstracts):
+def load_to_db(doc_records):
     """Save Django objects in bulk"""
-    for doc in documents:
+    for doc_record in doc_records:
+        doc = doc_record[0]
         source = doc.source
         try:
             db_source, created = _with_retry(Source.get_or_create)(
@@ -199,11 +188,24 @@ def load_to_db(itemids, authorships, citations, documents, abstracts):
         source.pk = db_source.pk
         if created:
             source.save()
-    bulk_create(queries=documents)
-    bulk_create(queries=itemids)
-    bulk_create(queries=authorships)
-    bulk_create(queries=citations)
-    bulk_create(queries=abstracts)
+
+    try:
+        bulk_create(doc_records)
+    except Exception:
+        json_log(error='Falling back to one-by-one',
+                 method=logging.debug)
+        # When transaction as bulk is failed, then go through each query
+        # one by one and create them. Also, log failed queries.
+        for doc_record in doc_records:
+            try:
+                create_doc(doc_record)
+            except Exception:
+                json_log(error='Loading to database failed',
+                         context={'eid': doc_record[0].eid},
+                         exception=True)
+    finally:
+        # Avoid memory leak when DEBUG == True
+        django.db.reset_queries()
 
 
 def _generate_files(path):
@@ -247,7 +249,8 @@ def generate_xml_pairs(path):
         if key in backlog:
             other_path, other_xml = backlog.pop(key)
             if other_path == path:
-                logging.error('Found duplicate xmls for %r' % path)
+                json_log(error='Found duplicate xmls for %r' % path,
+                         method=logging.error)
                 backlog[key] = (path, xml)
                 continue
             if path.endswith('citedby.xml'):
@@ -315,34 +318,19 @@ def extract_and_load_docs(paths, pool=None):
         imap = functools.partial(pool.imap_unordered, chunksize=200)
 
     counter = -1
-    itemid_batch = []
-    authorship_batch = []
-    document_batch = []
-    citation_batch = []
-    abstract_batch = []
+    doc_records = []
 
-    for counter, item in enumerate(imap(_process_one, xml_pairs)):
+    for counter, doc_record in enumerate(imap(_process_one, xml_pairs)):
         if counter % MAX_BATCH_SIZE == 0:
             if counter > 0:
                 logging.info('Saving after %d records' % counter)
-                load_to_db(itemid_batch, authorship_batch,
-                           citation_batch, document_batch,
-                           abstract_batch)
-            itemid_batch = []
-            authorship_batch = []
-            document_batch = []
-            citation_batch = []
-            abstract_batch = []
+                load_to_db(doc_records)
+            doc_records = []
 
-        if item is None:
+        if doc_record is None:
             continue
 
-        (itemids, authorships, citations, documents, abstracts) = item
-        itemid_batch.extend(itemids)
-        authorship_batch.extend(authorships)
-        citation_batch.extend(citations)
-        document_batch.extend(documents)
-        abstract_batch.extend(abstracts)
+        doc_records.append(doc_record)
 
     if counter < 0:
         json_log(error='Processed 0 records!', exception=True)
@@ -350,8 +338,7 @@ def extract_and_load_docs(paths, pool=None):
 
     # At end of the year, flush out all remaining records
     logging.info('Saving after %d records' % counter)
-    load_to_db(itemid_batch, authorship_batch, citation_batch,
-               document_batch, abstract_batch)
+    load_to_db(doc_records)
     logging.info('Done')
 
 

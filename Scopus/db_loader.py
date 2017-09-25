@@ -371,11 +371,23 @@ def main():
     ap = argparse.ArgumentParser('Extract Scopus snapshot to database')
     ap.add_argument('-j', '--jobs', type=int, default=1,
                     help='Number of concurrent workers. FIXME: this appears to degrade performance significantly, at least on Windows')
+    ap.add_argument('--count-only', action='store_true', default=False,
+                    help='Do not load. Only count how many documents there are to load.')
     ap.add_argument('paths', nargs='+',
                     help='Scopus XML files or directories, zips or tars thereof')
     args = ap.parse_args()
+
     FORMAT = "%(asctime)-15s %(message)s"
     logging.basicConfig(format=FORMAT)
+
+    if args.count_only:
+        logging.warning('Counting only')
+        count = sum(1 for path in args.paths
+                    for pair in generate_xml_pairs(path))
+        logging.warning('Found %d XML pairs in %d path(s)'
+                        % (count, len(args.paths)))
+        return
+
     logging.info('Extracting from XML in %d processes' % max(1, args.jobs))
     if args.jobs > 1:
         pool = multiprocessing.Pool(processes=args.jobs)

@@ -391,8 +391,8 @@ def main():
         for count, (path, _, _) in enumerate(gen):
             if (count + 1) % 100000 == 0:
                 logging.warning('Found %d XML pairs so far. Up to %s' % (count + 1, path))
-        logging.warning('Found %d XML pairs in %d path(s)'
-                        % (count + 1, len(args.paths)))
+        logging.warning('Found %d XML pairs (i.e. Documents)'
+                        % (count + 1,))
         return
 
     logging.info('Extracting from XML in %d processes' % max(1, args.jobs))

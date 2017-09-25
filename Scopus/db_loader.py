@@ -247,7 +247,8 @@ def generate_xml_pairs(path, eid_filter=None):
     backlog = {}
     for path, f in _generate_files(path):
         if not path.endswith('.xml'):
-            f.close()
+            if f is not None:
+                f.close()
             continue
 
         # TODO: filter before opening, or after pairing to avoid DB queries

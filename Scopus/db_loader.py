@@ -389,8 +389,8 @@ def main():
         gen = itertools.chain.from_iterable(generate_xml_pairs(path, count_only=True)
                                             for path in args.paths)
         for count, (path, _, _) in enumerate(gen):
-            if count % 100000 == 0:
-                logging.warning('Found %d XML pairs so far. Up to %s' % (count, path))
+            if (count + 1) % 10000 == 0:
+                logging.warning('Found %d XML pairs so far. Up to %s' % (count + 1, path))
         logging.warning('Found %d XML pairs in %d path(s)'
                         % (count + 1, len(args.paths)))
         return

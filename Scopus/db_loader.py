@@ -384,11 +384,15 @@ def main():
     logging.basicConfig(format=FORMAT)
 
     if args.count_only:
-        logging.warning('Counting only')
-        count = sum(1 for path in args.paths
-                    for pair in generate_xml_pairs(path))
+        logging.warning('COUNTING ONLY')
+        count = -1
+        gen = itertools.chain.from_iterable(generate_xml_pairs(path, count_only=True)
+                                            for path in args.paths)
+        for count, (path, _, _) in enumerate(gen):
+            if count % 100000 == 0:
+                logging.warning('Found %d XML pairs so far. Up to %s' % (count, path))
         logging.warning('Found %d XML pairs in %d path(s)'
-                        % (count, len(args.paths)))
+                        % (count + 1, len(args.paths)))
         return
 
     logging.info('Extracting from XML in %d processes' % max(1, args.jobs))

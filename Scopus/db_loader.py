@@ -235,7 +235,7 @@ def _generate_files(path):
             yield info.filename, _with_retry(archive.open)(info)
 
 
-def generate_xml_pairs(path, eid_filter=None):
+def generate_xml_pairs(path, eid_filter=None, count_only=False):
     """Finds and returns contents for pairs of XML documents and citedby
 
     path may be:
@@ -260,8 +260,11 @@ def generate_xml_pairs(path, eid_filter=None):
                          method=logging.info)
             f.close()
             continue
-        xml = f.read()
-        f.close()
+        if count_only:
+            xml = None
+        else:
+            xml = f.read()
+            f.close()
         key = os.path.dirname(path)
         if key in backlog:
             other_path, other_xml = backlog.pop(key)

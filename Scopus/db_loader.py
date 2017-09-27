@@ -192,7 +192,10 @@ def load_to_db(doc_records):
                      exception=True)
         source.pk = db_source.pk
         if created:
+            # store other fields
             source.save()
+        assert doc.source.pk is not None
+        doc.source_id = doc.source.pk
 
     try:
         bulk_create(doc_records)

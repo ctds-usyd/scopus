@@ -73,7 +73,7 @@ class Document(models.Model):
     # keywords = models.ManyToManyField(Keywords)
     title = models.CharField(max_length=500, null=False, blank=False,
                              help_text='The original (untranslated) title')
-    source = models.ForeignKey(Source, blank=True, null=True,
+    source = models.ForeignKey(Source, null=False,
                                db_index=True, help_text='Where the document is published')
     citation_count = models.IntegerField(default=0, help_text='Citation count from citedby.xml')
     title_language = models.CharField(max_length=5, default='',

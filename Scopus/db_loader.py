@@ -164,10 +164,10 @@ def bulk_create(doc_records):
 
 @transaction.atomic
 def create_doc(doc_record):
-    _with_retry(doc_record[0].save)()
+    doc_record[0].save()
     for same_model_objs in doc_record[1:]:
         for obj in same_model_objs:
-            _with_retry(obj.save)()
+            obj.save()
 
 
 def load_to_db(doc_records):
@@ -198,7 +198,7 @@ def load_to_db(doc_records):
         doc.source_id = doc.source.pk
 
     try:
-        bulk_create(doc_records)
+        _with_retry(bulk_create)(doc_records)
     except Exception:
         json_log(error='Falling back to one-by-one',
                  method=logging.debug)
@@ -206,7 +206,7 @@ def load_to_db(doc_records):
         # one by one and create them. Also, log failed queries.
         for doc_record in doc_records:
             try:
-                create_doc(doc_record)
+                _with_retry(create_doc)(doc_record)
             except Exception:
                 json_log(error='Loading to database failed',
                          context={'eid': doc_record[0].eid},

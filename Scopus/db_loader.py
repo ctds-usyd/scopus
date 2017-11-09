@@ -4,7 +4,6 @@
 import argparse
 import logging
 import multiprocessing
-import sys
 import time
 import os
 import tarfile
@@ -12,7 +11,7 @@ import zipfile
 import itertools
 import functools
 import warnings
-from collections import defaultdict
+import re
 
 import django
 from django.utils.encoding import smart_str, smart_text
@@ -255,8 +254,8 @@ def generate_xml_pairs(path, eid_filter=None, count_only=False):
             continue
 
         # TODO: filter before opening, or after pairing to avoid DB queries
-        if eid_filter is not None \
-           and eid_filter(int(os.path.dirname(path).rsplit('-')[-1])):
+        if (eid_filter is not None
+                and eid_filter(int(re.findall('(?<=2-s2.0-)[0-9]+', path)[-1]))):
             n_skips += 1
             if n_skips % 100000 == 0:
                 json_log(info='Skipped %d files so far' % n_skips,

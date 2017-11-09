@@ -1,9 +1,7 @@
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': DATABASE_NAME,
-        'USER': DATABASE_USER,
-        'PASSWORD': PASSWORD,
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '/tmp/woo.db',
         'HOST': 'localhost',
         'PORT': 3306,
      }

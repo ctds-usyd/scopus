@@ -303,6 +303,7 @@ def _process_one(tup):
         json_log(error='Uncaught error in extraction from XML',
                  context={'path': path},
                  exception=True)
+        return
 
     if item['document'] is not None:
         try:
@@ -311,6 +312,7 @@ def _process_one(tup):
             json_log(error='Uncaught error in producing django records',
                      context={'eid': item['document'].get('eid')},
                      exception=True)
+            return
 
 
 try:
